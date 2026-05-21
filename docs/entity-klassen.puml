@@ -1,0 +1,44 @@
+﻿@startuml
+skinparam classAttributeIconSize 0
+
+title Entity-Klassen Studien-Dashboard - Phase 1
+
+class Studium {
+  - studiengang: str
+  - startdatum: date
+  - zielEcts: int
+  - zielMonate: int
+  - zielNotendurchschnitt: float
+  + berechneStudierteMonate(): int
+  + berechneAbgeschlosseneEcts(): int
+  + berechneOffeneEcts(): int
+  + berechneVelocity(): float
+}
+
+class Modul {
+  - id: str
+  - titel: str
+  - ects: int
+  - empfohlenesSemester: int
+  - status: str
+  + istAbgeschlossen(): bool
+}
+
+class Pruefungsleistung {
+  - pruefungsform: str
+  - note: float
+  - bestanden: bool
+  - versuch: int
+  + istBestanden(): bool
+}
+
+Studium "1" o-- "0..*" Modul : enthaelt
+Modul "1" o-- "0..1" Pruefungsleistung : hat optional
+
+note right of Modul
+  Module sind nicht fest an Semester gebunden.
+  empfohlenesSemester ist nur ein optionaler Hinweis.
+  Der Fortschritt wird ueber status abgebildet.
+end note
+
+@enduml
