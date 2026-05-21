@@ -1,18 +1,22 @@
 ﻿@startuml
 skinparam classAttributeIconSize 0
 
-title Entity-Klassen Studien-Dashboard - Phase 1
+title Entity-Klassen Studien-Dashboard
 
 class Studium {
   - studiengang: str
   - startdatum: date
+  - zielDatum: date
   - zielEcts: int
   - zielMonate: int
   - zielNotendurchschnitt: float
-  + berechneStudierteMonate(): int
+  + anzahlModule(): int
   + berechneAbgeschlosseneEcts(): int
+  + berechneAnerkannteEcts(): int
+  + berechneFertigeEcts(): int
+  + berechneEctsInArbeit(): int
   + berechneOffeneEcts(): int
-  + berechneVelocity(): float
+  + berechneEctsFuerVelocity(): int
 }
 
 class Modul {
@@ -20,16 +24,32 @@ class Modul {
   - titel: str
   - ects: int
   - empfohlenesSemester: int
-  - status: str
+  - status: ModulStatus
   + istAbgeschlossen(): bool
 }
 
 class Pruefungsleistung {
-  - pruefungsform: str
+  - pruefungsform: Pruefungsform
   - note: float
   - bestanden: bool
   - versuch: int
-  + istBestanden(): bool
+}
+
+enum Pruefungsform {
+  KLAUSUR
+  HAUSARBEIT
+  PORTFOLIO
+  PROJEKT
+  SEMINAR
+  PRAESENTATION
+  BACHELORARBEIT
+}
+
+enum ModulStatus {
+  OFFEN
+  IN_ARBEIT
+  FERTIG
+  ANERKANNT
 }
 
 Studium "1" o-- "0..*" Modul : enthaelt
@@ -39,6 +59,18 @@ note right of Modul
   Module sind nicht fest an Semester gebunden.
   empfohlenesSemester ist nur ein optionaler Hinweis.
   Der Fortschritt wird ueber status abgebildet.
+  FERTIG und ANERKANNT zaehlen fuer
+  den ECTS-Fortschritt.
+  ANERKANNT zaehlt nicht fuer die Velocity.
+end note
+
+note bottom of Studium
+  Studium ist der einfache Domaenenkern
+  mit Modulen und Zielwerten.
+  Komplexere Dashboard-Auswertungen wie
+  Velocity, Prognose, Notendurchschnitt
+  und Planstatus koennen in Phase 2
+  in Service-Klassen berechnet werden.
 end note
 
 @enduml

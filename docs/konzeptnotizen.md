@@ -8,7 +8,7 @@
   - Reichen die bisher erreichten ECTS fuer das 36-Monats-Ziel?
   - Wie viele ECTS fehlen noch?
   - Wie schnell schreitet das Studium aktuell voran?
-  - Welche Module sind offen, in Arbeit oder fertig?
+  - Welche Module sind offen, in Arbeit, fertig oder anerkannt?
 
 ## Dashboard-Ziele
 
@@ -16,6 +16,7 @@
 - ECTS-Ziel und bisherige ECTS anzeigen.
 - Studiendauer ab Startdatum berechnen.
 - Velocity in ECTS pro Monat berechnen.
+- Anerkannte Module beim Abschlussfortschritt beruecksichtigen, aber nicht in die Velocity einrechnen.
 - Prognose fuer die restliche Studiendauer anzeigen.
 - Modulstatus und Noten in einer einfachen Tabelle zeigen.
 
@@ -25,6 +26,7 @@
 - offene ECTS
 - bisherige Studiendauer in Monaten
 - ECTS pro Monat
+- ECTS pro Monat ohne anerkannte Module
 - Ziel-ECTS pro Monat
 - Prognose der Restmonate
 - Restworkload in Stunden
@@ -39,6 +41,9 @@
   - offen
   - in Arbeit
   - fertig
+  - anerkannt
+- Anerkannte Module gelten fuer den ECTS-Fortschritt als abgeschlossen.
+- Anerkannte Module werden nicht in die Velocity-Berechnung einbezogen.
 
 ## Warum CSV?
 
