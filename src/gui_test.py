@@ -43,6 +43,24 @@ module = [
 ]
 
 
+FARBEN = {
+    "anerkannt": "#7ee08b",
+    "fertig": "#34c969",
+    "in Arbeit": "#ffe680",
+    "offen": "#a9d8f5",
+    "prognose": "#ffc3c7",
+    "rahmen": "#222222",
+    "hintergrund": "#fbfbf8",
+}
+
+ZIEL_ECTS = 180
+ZIEL_NOTENSCHNITT = "2.0"
+AKTUELLER_NOTENSCHNITT = "1.7"
+ZIEL_VELOCITY = 5
+AKTUELLE_VELOCITY = 6
+PROGNOSE_ENDE = "01.06.2027"
+
+
 def berechne_ects(status):
     summe = 0
 
@@ -53,33 +71,168 @@ def berechne_ects(status):
     return summe
 
 
-def zeichne_donut(canvas, werte, prozent_fertig):
-    gesamt = 0
+def berechne_kennzahlen():
+    ects_anerkannt = berechne_ects("anerkannt")
+    ects_fertig = berechne_ects("fertig")
+    ects_in_arbeit = berechne_ects("in Arbeit")
+    ects_offen = berechne_ects("offen")
+    ects_abgeschlossen = ects_anerkannt + ects_fertig
+    prozent_fertig = round(ects_abgeschlossen / ZIEL_ECTS * 100)
 
-    for wert in werte:
-        gesamt = gesamt + wert[1]
+    return {
+        "anerkannt": ects_anerkannt,
+        "fertig": ects_fertig,
+        "in Arbeit": ects_in_arbeit,
+        "offen": ects_offen,
+        "abgeschlossen": ects_abgeschlossen,
+        "prozent_fertig": prozent_fertig,
+    }
 
-    start_winkel = 90
+
+def zeichne_donut(canvas, werte):
+    gesamt = sum(wert[1] for wert in werte)
+    start_winkel = 120
+
+    canvas.delete("all")
 
     for name, ects, farbe in werte:
+        if gesamt == 0:
+            continue
+
         winkel = 360 * ects / gesamt
         canvas.create_arc(
-            10,
-            10,
-            170,
-            170,
+            8,
+            8,
+            148,
+            148,
             start=start_winkel,
             extent=winkel,
             fill=farbe,
-            outline="white",
+            outline=FARBEN["rahmen"],
             width=2,
         )
         start_winkel = start_winkel + winkel
 
-    # Innerer Kreis macht aus dem Kuchendiagramm ein Donutdiagramm.
-    canvas.create_oval(62, 62, 118, 118, fill="white", outline="black", width=2)
-    canvas.create_text(90, 84, text=str(prozent_fertig) + "%", font=("Arial", 14, "bold"))
-    canvas.create_text(90, 104, text="fertig", font=("Arial", 9))
+    canvas.create_oval(54, 54, 102, 102, fill=FARBEN["hintergrund"], outline=FARBEN["rahmen"], width=2)
+
+
+def erstelle_kopfbereich(parent, kennzahlen):
+    kopfbereich = tk.Frame(parent, bg=FARBEN["hintergrund"], highlightthickness=2, highlightbackground=FARBEN["rahmen"])
+    kopfbereich.pack(fill="x")
+
+    info_bereich = tk.Frame(kopfbereich, bg=FARBEN["hintergrund"], padx=14, pady=10)
+    info_bereich.grid(row=0, column=0, sticky="nsew")
+
+    tk.Label(info_bereich, text="Study-Dashboard", bg=FARBEN["hintergrund"], font=("Segoe UI", 23, "bold")).pack(anchor="w")
+
+    infos = [
+        "B. Sc. Softwareentwicklung",
+        "Studienstart: 01.03.2024",
+        "Regelstudienzeit: 01.03.2027",
+        "Ziel-ECTS: 180",
+    ]
+
+    for text in infos:
+        tk.Label(info_bereich, text="<> " + text, bg=FARBEN["hintergrund"], font=("Segoe UI", 11)).pack(anchor="w")
+
+    diagramm_bereich = tk.Frame(kopfbereich, bg=FARBEN["hintergrund"], padx=18, pady=8)
+    diagramm_bereich.grid(row=0, column=1, sticky="e")
+
+    status_werte = [
+        ("anerkannt", kennzahlen["anerkannt"], FARBEN["anerkannt"]),
+        ("fertig", kennzahlen["fertig"], FARBEN["fertig"]),
+        ("in Arbeit", kennzahlen["in Arbeit"], FARBEN["in Arbeit"]),
+        ("offen", kennzahlen["offen"], FARBEN["offen"]),
+    ]
+
+    donut = tk.Canvas(diagramm_bereich, width=156, height=156, bg=FARBEN["hintergrund"], highlightthickness=0)
+    donut.grid(row=0, column=0, padx=(0, 20))
+    zeichne_donut(donut, status_werte)
+
+    legende = tk.Frame(diagramm_bereich, bg=FARBEN["hintergrund"])
+    legende.grid(row=0, column=1, sticky="w")
+
+    for zeile, status_wert in enumerate(status_werte):
+        name, ects, farbe = status_wert
+        farbfeld = tk.Label(legende, text="  ", bg=farbe, highlightthickness=1, highlightbackground=FARBEN["rahmen"])
+        farbfeld.grid(row=zeile, column=0, padx=(0, 8), pady=4)
+        tk.Label(legende, text=f"{ects} ECTS {name}", bg=FARBEN["hintergrund"], font=("Segoe UI", 10)).grid(row=zeile, column=1, sticky="w")
+
+    kopfbereich.columnconfigure(0, weight=1)
+
+
+def erstelle_kennzahl(parent, spalte, titel, zeilen, farbe):
+    kachel = tk.Frame(parent, bg=farbe, highlightthickness=2, highlightbackground=FARBEN["rahmen"])
+    kachel.grid(row=0, column=spalte, sticky="nsew", padx=12)
+
+    titel_label = tk.Label(
+        kachel,
+        text=titel,
+        bg=farbe,
+        anchor="w",
+        padx=9,
+        pady=3,
+        font=("Segoe UI", 11, "bold"),
+        highlightthickness=1,
+        highlightbackground=FARBEN["rahmen"],
+    )
+    titel_label.pack(fill="x")
+
+    inhalt = tk.Frame(kachel, bg=farbe, padx=10, pady=10)
+    inhalt.pack(fill="both", expand=True)
+
+    for text, schrift in zeilen:
+        tk.Label(inhalt, text=text, bg=farbe, anchor="w", justify="left", font=schrift).pack(anchor="w")
+
+
+def erstelle_kennzahlenbereich(parent, kennzahlen):
+    kachel_bereich = tk.Frame(parent, bg=FARBEN["hintergrund"], pady=16)
+    kachel_bereich.pack(fill="x")
+
+    erstelle_kennzahl(
+        kachel_bereich,
+        0,
+        "ECTS",
+        [
+            (f"{kennzahlen['abgeschlossen']}/{ZIEL_ECTS}", ("Segoe UI", 13)),
+            (f"{kennzahlen['prozent_fertig']}% fertig", ("Segoe UI", 13, "bold")),
+        ],
+        "#b5f1bd",
+    )
+    erstelle_kennzahl(
+        kachel_bereich,
+        1,
+        "Notenschnitt",
+        [
+            (f"Ziel: {ZIEL_NOTENSCHNITT}", ("Segoe UI", 11)),
+            (f"Aktuell: {AKTUELLER_NOTENSCHNITT}", ("Segoe UI", 13, "bold")),
+        ],
+        FARBEN["offen"],
+    )
+    erstelle_kennzahl(
+        kachel_bereich,
+        2,
+        "Velocity",
+        [
+            (f"Ziel: {ZIEL_VELOCITY} ECTS/Monat", ("Segoe UI", 11)),
+            (f"Aktuell: {AKTUELLE_VELOCITY} ECTS/Monat", ("Segoe UI", 12, "bold")),
+        ],
+        FARBEN["in Arbeit"],
+    )
+    erstelle_kennzahl(
+        kachel_bereich,
+        3,
+        "Prognose",
+        [
+            (f"Ende: {PROGNOSE_ENDE}", ("Segoe UI", 11, "bold")),
+            ("3 Monate", ("Segoe UI", 11)),
+            ("hinter Plan", ("Segoe UI", 11)),
+        ],
+        FARBEN["prognose"],
+    )
+
+    for spalte in range(4):
+        kachel_bereich.columnconfigure(spalte, weight=1, uniform="kennzahlen")
 
 
 def sortiere_tabelle(spalte):
@@ -102,121 +255,76 @@ def sortiere_tabelle(spalte):
     sortierung_absteigend[spalte] = not sortierung_absteigend[spalte]
 
 
-fenster = tk.Tk()
-fenster.title("Studien-Dashboard Test")
-fenster.geometry("1050x760")
+def erstelle_tabelle(parent):
+    global tabelle
+    global sortierung_absteigend
 
-hauptbereich = tk.Frame(fenster, padx=18, pady=14)
+    trennlinie = tk.Frame(parent, height=3, bg=FARBEN["rahmen"])
+    trennlinie.pack(fill="x", pady=(2, 14))
+
+    tabellen_bereich = tk.Frame(parent, bg=FARBEN["hintergrund"], highlightthickness=2, highlightbackground=FARBEN["rahmen"], padx=14, pady=14)
+    tabellen_bereich.pack(fill="both", expand=True)
+
+    style = ttk.Style()
+    style.theme_use("default")
+    style.configure("Treeview", font=("Segoe UI", 10), rowheight=27, background="white", fieldbackground="white")
+    style.configure("Treeview.Heading", font=("Segoe UI", 10, "bold"), padding=6)
+
+    sortierung_absteigend = {
+        "kuerzel": False,
+        "ects": False,
+        "kursname": False,
+        "pruefungsform": False,
+        "status": False,
+        "note": False,
+    }
+
+    tabelle = ttk.Treeview(
+        tabellen_bereich,
+        columns=("kuerzel", "ects", "kursname", "pruefungsform", "status", "note"),
+        show="headings",
+        height=14,
+    )
+
+    tabelle.heading("kuerzel", text="Kuerzel", command=lambda: sortiere_tabelle("kuerzel"))
+    tabelle.heading("ects", text="ECTS", command=lambda: sortiere_tabelle("ects"))
+    tabelle.heading("kursname", text="Kursname", command=lambda: sortiere_tabelle("kursname"))
+    tabelle.heading("pruefungsform", text="Pruefungsform", command=lambda: sortiere_tabelle("pruefungsform"))
+    tabelle.heading("status", text="Status", command=lambda: sortiere_tabelle("status"))
+    tabelle.heading("note", text="Note", command=lambda: sortiere_tabelle("note"))
+
+    tabelle.column("kuerzel", width=140, anchor="w", stretch=False)
+    tabelle.column("ects", width=70, anchor="center", stretch=False)
+    tabelle.column("kursname", width=420, anchor="w", stretch=True)
+    tabelle.column("pruefungsform", width=145, anchor="w", stretch=False)
+    tabelle.column("status", width=140, anchor="w", stretch=False)
+    tabelle.column("note", width=80, anchor="center", stretch=False)
+
+    for modul in module:
+        tabelle.insert("", "end", values=modul)
+
+    scrollbar = ttk.Scrollbar(tabellen_bereich, orient="vertical", command=tabelle.yview)
+    tabelle.configure(yscrollcommand=scrollbar.set)
+
+    tabelle.grid(row=0, column=0, sticky="nsew")
+    scrollbar.grid(row=0, column=1, sticky="ns")
+
+    tabellen_bereich.rowconfigure(0, weight=1)
+    tabellen_bereich.columnconfigure(0, weight=1)
+
+
+fenster = tk.Tk()
+fenster.title("Study-Dashboard")
+fenster.geometry("980x760")
+fenster.minsize(880, 640)
+fenster.configure(bg=FARBEN["hintergrund"])
+
+hauptbereich = tk.Frame(fenster, bg=FARBEN["hintergrund"], padx=8, pady=8)
 hauptbereich.pack(fill="both", expand=True)
 
-# Oberer Bereich: links Text, rechts Donutdiagramm mit Zahlen
-kopfbereich = tk.Frame(hauptbereich, borderwidth=2, relief="solid", padx=12, pady=8)
-kopfbereich.pack(fill="x")
-
-info_bereich = tk.Frame(kopfbereich)
-info_bereich.grid(row=0, column=0, sticky="w")
-
-tk.Label(info_bereich, text="Study-Dashboard", font=("Arial", 22, "bold")).pack(anchor="w")
-tk.Label(info_bereich, text="o B. Sc. Softwareentwicklung", font=("Arial", 11)).pack(anchor="w")
-tk.Label(info_bereich, text="o Studienstart: 01.03.2024", font=("Arial", 11)).pack(anchor="w")
-tk.Label(info_bereich, text="o Studienziel: 01.03.2027", font=("Arial", 11)).pack(anchor="w")
-tk.Label(info_bereich, text="o Hinter Plan", font=("Arial", 11)).pack(anchor="w")
-
-diagramm_bereich = tk.Frame(kopfbereich)
-diagramm_bereich.grid(row=0, column=1, sticky="e", padx=(40, 0))
-
-ects_anerkannt = berechne_ects("anerkannt")
-ects_fertig = berechne_ects("fertig")
-ects_in_arbeit = berechne_ects("in Arbeit")
-ects_offen = berechne_ects("offen")
-ects_gesamt = ects_anerkannt + ects_fertig + ects_in_arbeit + ects_offen
-prozent_fertig = round((ects_anerkannt + ects_fertig) / ects_gesamt * 100)
-
-status_werte = [
-    ("anerkannt", ects_anerkannt, "#9ee6a3"),
-    ("fertig", ects_fertig, "#19b957"),
-    ("in Arbeit", ects_in_arbeit, "#ffd966"),
-    ("offen", ects_offen, "#9fd3f5"),
-]
-
-donut = tk.Canvas(diagramm_bereich, width=180, height=180)
-donut.grid(row=0, column=0, padx=10)
-zeichne_donut(donut, status_werte, prozent_fertig)
-
-legende = tk.Frame(diagramm_bereich)
-legende.grid(row=0, column=1, sticky="w")
-
-for zeile, status_wert in enumerate(status_werte):
-    name = status_wert[0]
-    ects = status_wert[1]
-    farbe = status_wert[2]
-
-    tk.Label(legende, text="  ", bg=farbe, borderwidth=1, relief="solid").grid(row=zeile, column=0, padx=6, pady=4)
-    tk.Label(legende, text=str(ects) + " ECTS " + name).grid(row=zeile, column=1, sticky="w")
-
-kopfbereich.columnconfigure(0, weight=1)
-
-# Mittlerer Bereich: Kennzahlen-Kacheln
-kachel_bereich = tk.Frame(hauptbereich)
-kachel_bereich.pack(fill="x", pady=12)
-
-kennzahlen = [
-    ("ECTS", "80/180", "#aef0b8"),
-    ("Notenschnitt", "2.1\nziel 2.0", "#9fd3f5"),
-    ("Velocity", "5 ECTS/Monat", "#ffd966"),
-    ("Prognose", "Ende: 01.06.2027\n3 Monate\nhinter Plan", "#ffc4c4"),
-]
-
-for spalte, kennzahl in enumerate(kennzahlen):
-    titel = kennzahl[0]
-    wert = kennzahl[1]
-    farbe = kennzahl[2]
-
-    kachel = tk.Frame(kachel_bereich, bg=farbe, borderwidth=2, relief="solid", padx=10, pady=8)
-    kachel.grid(row=0, column=spalte, sticky="nsew", padx=10)
-
-    tk.Label(kachel, text=titel, bg=farbe, font=("Arial", 12, "bold")).pack(anchor="w")
-    tk.Label(kachel, text=wert, bg=farbe, font=("Arial", 12), justify="left").pack(anchor="w", pady=(4, 0))
-
-    kachel_bereich.columnconfigure(spalte, weight=1)
-
-# Unterer Bereich: Modultabelle
-tabellen_bereich = tk.Frame(hauptbereich, borderwidth=2, relief="solid", padx=10, pady=10)
-tabellen_bereich.pack(fill="both", expand=True)
-
-sortierung_absteigend = {
-    "kuerzel": False,
-    "ects": False,
-    "kursname": False,
-    "pruefungsform": False,
-    "status": False,
-    "note": False,
-}
-
-tabelle = ttk.Treeview(
-    tabellen_bereich,
-    columns=("kuerzel", "ects", "kursname", "pruefungsform", "status", "note"),
-    show="headings",
-    height=15,
-)
-
-tabelle.heading("kuerzel", text="Kuerzel", command=lambda: sortiere_tabelle("kuerzel"))
-tabelle.heading("ects", text="ECTS", command=lambda: sortiere_tabelle("ects"))
-tabelle.heading("kursname", text="Kursname", command=lambda: sortiere_tabelle("kursname"))
-tabelle.heading("pruefungsform", text="Pruefungsform", command=lambda: sortiere_tabelle("pruefungsform"))
-tabelle.heading("status", text="Status", command=lambda: sortiere_tabelle("status"))
-tabelle.heading("note", text="Note", command=lambda: sortiere_tabelle("note"))
-
-tabelle.column("kuerzel", width=130)
-tabelle.column("ects", width=60)
-tabelle.column("kursname", width=420)
-tabelle.column("pruefungsform", width=130)
-tabelle.column("status", width=120)
-tabelle.column("note", width=80)
-
-for modul in module:
-    tabelle.insert("", "end", values=modul)
-
-tabelle.pack(fill="both", expand=True)
+kennzahlen = berechne_kennzahlen()
+erstelle_kopfbereich(hauptbereich, kennzahlen)
+erstelle_kennzahlenbereich(hauptbereich, kennzahlen)
+erstelle_tabelle(hauptbereich)
 
 fenster.mainloop()
