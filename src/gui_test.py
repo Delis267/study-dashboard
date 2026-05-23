@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 from tkinter import ttk
 
 
@@ -59,6 +60,12 @@ AKTUELLER_NOTENSCHNITT = "1.7"
 ZIEL_VELOCITY = 5
 AKTUELLE_VELOCITY = 6
 PROGNOSE_ENDE = "01.06.2027"
+STATUS_WERTE = ("anerkannt", "fertig", "in Arbeit", "offen")
+
+dashboard_anzeigen = {}
+formular_felder = {}
+aktiver_editor = None
+kontextmenue = None
 
 
 def berechne_ects(status):
@@ -87,6 +94,34 @@ def berechne_kennzahlen():
         "abgeschlossen": ects_abgeschlossen,
         "prozent_fertig": prozent_fertig,
     }
+
+
+def aktualisiere_modulliste_aus_tabelle():
+    module.clear()
+
+    for zeile in tabelle.get_children():
+        werte = list(tabelle.item(zeile, "values"))[:6]
+        werte[1] = int(werte[1])
+        module.append(tuple(werte))
+
+
+def aktualisiere_dashboard():
+    kennzahlen = berechne_kennzahlen()
+
+    dashboard_anzeigen["ects"].config(text=f"{kennzahlen['abgeschlossen']}/{ZIEL_ECTS}")
+    dashboard_anzeigen["ects_prozent"].config(text=f"{kennzahlen['prozent_fertig']}% fertig")
+
+    status_werte = [
+        ("anerkannt", kennzahlen["anerkannt"], FARBEN["anerkannt"]),
+        ("fertig", kennzahlen["fertig"], FARBEN["fertig"]),
+        ("in Arbeit", kennzahlen["in Arbeit"], FARBEN["in Arbeit"]),
+        ("offen", kennzahlen["offen"], FARBEN["offen"]),
+    ]
+
+    zeichne_donut(dashboard_anzeigen["donut"], status_werte)
+
+    for name, ects, farbe in status_werte:
+        dashboard_anzeigen["legende"][name].config(text=f"{ects} ECTS {name}")
 
 
 def zeichne_donut(canvas, werte):
@@ -147,16 +182,20 @@ def erstelle_kopfbereich(parent, kennzahlen):
 
     donut = tk.Canvas(diagramm_bereich, width=156, height=156, bg=FARBEN["hintergrund"], highlightthickness=0)
     donut.grid(row=0, column=0, padx=(0, 20))
+    dashboard_anzeigen["donut"] = donut
     zeichne_donut(donut, status_werte)
 
     legende = tk.Frame(diagramm_bereich, bg=FARBEN["hintergrund"])
     legende.grid(row=0, column=1, sticky="w")
+    dashboard_anzeigen["legende"] = {}
 
     for zeile, status_wert in enumerate(status_werte):
         name, ects, farbe = status_wert
         farbfeld = tk.Label(legende, text="  ", bg=farbe, highlightthickness=1, highlightbackground=FARBEN["rahmen"])
         farbfeld.grid(row=zeile, column=0, padx=(0, 8), pady=4)
-        tk.Label(legende, text=f"{ects} ECTS {name}", bg=FARBEN["hintergrund"], font=("Segoe UI", 10)).grid(row=zeile, column=1, sticky="w")
+        legenden_text = tk.Label(legende, text=f"{ects} ECTS {name}", bg=FARBEN["hintergrund"], font=("Segoe UI", 10))
+        legenden_text.grid(row=zeile, column=1, sticky="w")
+        dashboard_anzeigen["legende"][name] = legenden_text
 
     kopfbereich.columnconfigure(0, weight=1)
 
@@ -181,8 +220,15 @@ def erstelle_kennzahl(parent, spalte, titel, zeilen, farbe):
     inhalt = tk.Frame(kachel, bg=farbe, padx=10, pady=10)
     inhalt.pack(fill="both", expand=True)
 
-    for text, schrift in zeilen:
-        tk.Label(inhalt, text=text, bg=farbe, anchor="w", justify="left", font=schrift).pack(anchor="w")
+    for index, zeile in enumerate(zeilen):
+        text, schrift = zeile
+        wert_label = tk.Label(inhalt, text=text, bg=farbe, anchor="w", justify="left", font=schrift)
+        wert_label.pack(anchor="w")
+
+        if titel == "ECTS" and index == 0:
+            dashboard_anzeigen["ects"] = wert_label
+        if titel == "ECTS" and index == 1:
+            dashboard_anzeigen["ects_prozent"] = wert_label
 
 
 def erstelle_kennzahlenbereich(parent, kennzahlen):
@@ -255,6 +301,209 @@ def sortiere_tabelle(spalte):
     sortierung_absteigend[spalte] = not sortierung_absteigend[spalte]
 
 
+def leere_hinzufuegen_formular():
+    for feldname in formular_felder:
+        formular_felder[feldname].set("")
+
+    formular_felder["ects"].set("5")
+    formular_felder["status"].set("offen")
+
+
+def lese_formularwerte():
+    kuerzel = formular_felder["kuerzel"].get().strip()
+    ects_text = formular_felder["ects"].get().strip()
+    kursname = formular_felder["kursname"].get().strip()
+    pruefungsform = formular_felder["pruefungsform"].get().strip()
+    status = formular_felder["status"].get().strip()
+    note = formular_felder["note"].get().strip()
+
+    if kuerzel == "" or kursname == "":
+        messagebox.showwarning("Eingabe fehlt", "Bitte mindestens Kuerzel und Kursname eintragen.")
+        return None
+
+    try:
+        ects = int(ects_text)
+    except ValueError:
+        messagebox.showwarning("ECTS ungueltig", "ECTS muss eine ganze Zahl sein.")
+        return None
+
+    if ects <= 0:
+        messagebox.showwarning("ECTS ungueltig", "ECTS muss groesser als 0 sein.")
+        return None
+
+    if status not in STATUS_WERTE:
+        messagebox.showwarning("Status ungueltig", "Bitte einen gueltigen Status auswaehlen.")
+        return None
+
+    return (kuerzel, ects, kursname, pruefungsform, status, note)
+
+
+def modul_hinzufuegen():
+    werte = lese_formularwerte()
+
+    if werte is None:
+        return
+
+    neue_zeile = tabelle.insert("", "end", values=werte)
+    tabelle.selection_set(neue_zeile)
+    tabelle.see(neue_zeile)
+    leere_hinzufuegen_formular()
+    aktualisiere_modulliste_aus_tabelle()
+    aktualisiere_dashboard()
+
+
+def module_loeschen(zeilen):
+    if not zeilen:
+        return
+
+    for zeile in zeilen:
+        tabelle.delete(zeile)
+
+    aktualisiere_modulliste_aus_tabelle()
+    aktualisiere_dashboard()
+
+
+def ausgewaehlte_module_loeschen(event=None):
+    module_loeschen(tabelle.selection())
+
+
+def starte_zelleneditor(event):
+    global aktiver_editor
+
+    zeile = tabelle.identify_row(event.y)
+    spalte_id = tabelle.identify_column(event.x)
+
+    if zeile == "" or spalte_id == "":
+        return
+
+    spalten = ("kuerzel", "ects", "kursname", "pruefungsform", "status", "note")
+    spalten_index = int(spalte_id.replace("#", "")) - 1
+    spalte = spalten[spalten_index]
+
+    if spalte not in ("kuerzel", "ects", "kursname", "pruefungsform", "status", "note"):
+        return
+
+    if aktiver_editor is not None:
+        aktiver_editor.destroy()
+        aktiver_editor = None
+
+    x, y, breite, hoehe = tabelle.bbox(zeile, spalte_id)
+    werte = list(tabelle.item(zeile, "values"))
+    alter_wert = werte[spalten_index]
+
+    variable = tk.StringVar(value=alter_wert)
+
+    if spalte == "status":
+        editor = ttk.Combobox(tabelle, textvariable=variable, values=STATUS_WERTE, state="readonly")
+    else:
+        editor = ttk.Entry(tabelle, textvariable=variable)
+
+    editor.place(x=x, y=y, width=breite, height=hoehe)
+    editor.focus_set()
+    aktiver_editor = editor
+
+    def speichern(event=None):
+        global aktiver_editor
+
+        neuer_wert = variable.get().strip()
+
+        if spalte == "ects":
+            try:
+                neuer_wert = int(neuer_wert)
+            except ValueError:
+                messagebox.showwarning("ECTS ungueltig", "ECTS muss eine ganze Zahl sein.")
+                editor.focus_set()
+                return
+
+            if neuer_wert <= 0:
+                messagebox.showwarning("ECTS ungueltig", "ECTS muss groesser als 0 sein.")
+                editor.focus_set()
+                return
+
+        if spalte == "status" and neuer_wert not in STATUS_WERTE:
+            return
+
+        werte[spalten_index] = neuer_wert
+        tabelle.item(zeile, values=werte)
+        editor.destroy()
+        aktiver_editor = None
+        aktualisiere_modulliste_aus_tabelle()
+        aktualisiere_dashboard()
+
+    def abbrechen(event=None):
+        global aktiver_editor
+
+        editor.destroy()
+        aktiver_editor = None
+
+    editor.bind("<Return>", speichern)
+    editor.bind("<FocusOut>", speichern)
+    editor.bind("<Escape>", abbrechen)
+
+    if spalte == "status":
+        editor.bind("<<ComboboxSelected>>", speichern)
+
+
+def zeige_kontextmenue(event):
+    zeile = tabelle.identify_row(event.y)
+
+    if zeile == "":
+        return
+
+    if zeile not in tabelle.selection():
+        tabelle.selection_set(zeile)
+
+    kontextmenue.tk_popup(event.x_root, event.y_root)
+
+
+def erstelle_kontextmenue(parent):
+    global kontextmenue
+
+    kontextmenue = tk.Menu(parent, tearoff=False)
+    kontextmenue.add_command(label="Ausgewaehlte Module loeschen", command=ausgewaehlte_module_loeschen)
+
+
+def erstelle_hinzufuegen_formular(parent):
+    detail = tk.Frame(parent, bg=FARBEN["hintergrund"], highlightthickness=2, highlightbackground=FARBEN["rahmen"], padx=12, pady=10)
+    detail.grid(row=1, column=0, sticky="ew", pady=(12, 0))
+
+    tk.Label(detail, text="Neues Modul", bg=FARBEN["hintergrund"], font=("Segoe UI", 13, "bold")).grid(row=0, column=0, sticky="w", padx=(0, 12))
+
+    feld_definitionen = [
+        ("kuerzel", "Kuerzel", 13, 0),
+        ("ects", "ECTS", 6, 0),
+        ("kursname", "Kursname", 28, 1),
+        ("pruefungsform", "Pruefungsform", 16, 0),
+        ("status", "Status", 13, 0),
+        ("note", "Note", 8, 0),
+    ]
+
+    for spalte, feld in enumerate(feld_definitionen, start=1):
+        feldname, beschriftung, breite, gewicht = feld
+        feldrahmen = tk.Frame(detail, bg=FARBEN["hintergrund"])
+        feldrahmen.grid(row=0, column=spalte, sticky="ew", padx=(0, 8))
+
+        tk.Label(feldrahmen, text=beschriftung, bg=FARBEN["hintergrund"], font=("Segoe UI", 9, "bold")).pack(anchor="w")
+        variable = tk.StringVar()
+        formular_felder[feldname] = variable
+
+        if feldname == "status":
+            eingabe = ttk.Combobox(feldrahmen, textvariable=variable, values=STATUS_WERTE, width=breite, state="readonly")
+        else:
+            eingabe = ttk.Entry(feldrahmen, textvariable=variable, width=breite)
+
+        eingabe.pack(fill="x")
+        detail.columnconfigure(spalte, weight=gewicht)
+
+    button_bereich = tk.Frame(detail, bg=FARBEN["hintergrund"])
+    button_bereich.grid(row=0, column=7, sticky="sew")
+
+    ttk.Button(button_bereich, text="Hinzufuegen", command=modul_hinzufuegen).grid(row=0, column=0, sticky="ew", pady=(17, 0), padx=(0, 6))
+    ttk.Button(button_bereich, text="Leeren", command=leere_hinzufuegen_formular).grid(row=0, column=1, sticky="ew", pady=(17, 0))
+
+    leere_hinzufuegen_formular()
+
+
 def erstelle_tabelle(parent):
     global tabelle
     global sortierung_absteigend
@@ -279,11 +528,20 @@ def erstelle_tabelle(parent):
         "note": False,
     }
 
+    tabelleninhalt = tk.Frame(tabellen_bereich, bg=FARBEN["hintergrund"])
+    tabelleninhalt.pack(fill="both", expand=True)
+
+    listenbereich = tk.Frame(tabelleninhalt, bg=FARBEN["hintergrund"])
+    listenbereich.grid(row=0, column=0, sticky="nsew")
+
+    erstelle_hinzufuegen_formular(tabelleninhalt)
+
     tabelle = ttk.Treeview(
-        tabellen_bereich,
+        listenbereich,
         columns=("kuerzel", "ects", "kursname", "pruefungsform", "status", "note"),
         show="headings",
         height=14,
+        selectmode="extended",
     )
 
     tabelle.heading("kuerzel", text="Kuerzel", command=lambda: sortiere_tabelle("kuerzel"))
@@ -303,14 +561,21 @@ def erstelle_tabelle(parent):
     for modul in module:
         tabelle.insert("", "end", values=modul)
 
-    scrollbar = ttk.Scrollbar(tabellen_bereich, orient="vertical", command=tabelle.yview)
+    scrollbar = ttk.Scrollbar(listenbereich, orient="vertical", command=tabelle.yview)
     tabelle.configure(yscrollcommand=scrollbar.set)
+    tabelle.bind("<Double-1>", starte_zelleneditor)
+    tabelle.bind("<Delete>", ausgewaehlte_module_loeschen)
+    tabelle.bind("<Button-3>", zeige_kontextmenue)
+    tabelle.bind("<Button-2>", zeige_kontextmenue)
+    erstelle_kontextmenue(tabelle)
 
     tabelle.grid(row=0, column=0, sticky="nsew")
     scrollbar.grid(row=0, column=1, sticky="ns")
 
-    tabellen_bereich.rowconfigure(0, weight=1)
-    tabellen_bereich.columnconfigure(0, weight=1)
+    listenbereich.rowconfigure(0, weight=1)
+    listenbereich.columnconfigure(0, weight=1)
+    tabelleninhalt.rowconfigure(0, weight=1)
+    tabelleninhalt.columnconfigure(0, weight=1)
 
 
 fenster = tk.Tk()
