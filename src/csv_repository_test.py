@@ -1,7 +1,6 @@
 ﻿import csv
 import os
 
-
 class CsvModulRepository:
     def __init__(self, dateiname):
         self.dateiname = dateiname
@@ -32,6 +31,7 @@ class CsvModulRepository:
 
         return module
 
+    # Loescht ein Modul anhand der ID indem es alles löscht und ohne das Modul mit der ID neu schreibt
     def deleteModulById(self, id):
         module = self.printAllModuls()
 

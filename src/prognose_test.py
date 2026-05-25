@@ -1,51 +1,77 @@
-﻿from datetime import date
+from datetime import date
 
 
-# Beispielwerte fuer den Machbarkeitstest
-startdatum = date(2024, 10, 1)
+# Machbarkeitstest Phase 1:
+# Die Kennzahlen werden dynamisch aus wenigen stabilen Parametern berechnet.
+# Sie werden nicht statisch gespeichert.
+
+startdatum = date(2024, 3, 1)
 heute = date.today()
 
 ziel_ects = 180
-ziel_monate = 36
-selbst_erarbeitete_ects = 60
-anerkannte_ects = 20
-workload_pro_ects = 30
+regelstudienzeit_monate = 36
+selbst_erarbeitete_ects = 105
+anerkannte_ects = 15
 
-# Monate seit Studienstart berechnen
-studierte_monate = (heute.year - startdatum.year) * 12 + (heute.month - startdatum.month)
 
-if heute.day >= startdatum.day:
-    studierte_monate = studierte_monate + 1
+def berechne_studierte_monate(start, ende):
+    monate = (ende.year - start.year) * 12 + ende.month - start.month
 
-if studierte_monate < 1:
-    studierte_monate = 1
+    if ende.day >= start.day:
+        monate = monate + 1
 
-# Einfache Kennzahlen berechnen
+    if monate < 1:
+        monate = 1
+
+    return monate
+
+
+def addiere_monate(start, monate):
+    jahr = start.year + (start.month - 1 + monate) // 12
+    monat = (start.month - 1 + monate) % 12 + 1
+
+    return date(jahr, monat, 1)
+
+
+studierte_monate = berechne_studierte_monate(startdatum, heute)
+
 abgeschlossene_ects = selbst_erarbeitete_ects + anerkannte_ects
 offene_ects = ziel_ects - abgeschlossene_ects
 
 # Anerkannte ECTS zaehlen zum Fortschritt, aber nicht zur Velocity.
-ects_pro_monat = selbst_erarbeitete_ects / studierte_monate
-ziel_ects_pro_monat = ziel_ects / ziel_monate
+velocity = selbst_erarbeitete_ects / studierte_monate
+ziel_velocity = ziel_ects / regelstudienzeit_monate
 
-if ects_pro_monat > 0:
-    prognose_restmonate = offene_ects / ects_pro_monat
+if velocity > 0:
+    prognose_restmonate = offene_ects / velocity
 else:
     prognose_restmonate = 0
 
-restworkload_stunden = offene_ects * workload_pro_ects
+prognose_gesamtmonate = studierte_monate + prognose_restmonate
+prognose_enddatum = addiere_monate(startdatum, round(prognose_gesamtmonate))
 
-print("Studien-Dashboard Prognose-Test")
+print("Prognose-Test Studien-Dashboard")
 print("-------------------------------")
 print("Startdatum:", startdatum)
 print("Heutiges Datum:", heute)
-print("Studierte Monate:", studierte_monate)
+print("Ende Regelstudienzeit:", addiere_monate(startdatum, regelstudienzeit_monate))
 print("Ziel-ECTS:", ziel_ects)
+print("Studierte Monate:", studierte_monate)
+print("Selbst erarbeitete ECTS:", selbst_erarbeitete_ects)
+print("Anerkannte ECTS:", anerkannte_ects)
 print("Abgeschlossene ECTS:", abgeschlossene_ects)
-print("Davon selbst erarbeitet:", selbst_erarbeitete_ects)
-print("Davon anerkannt:", anerkannte_ects)
 print("Offene ECTS:", offene_ects)
-print("ECTS pro Monat ohne anerkannte Module:", round(ects_pro_monat, 2))
-print("Ziel-ECTS pro Monat:", round(ziel_ects_pro_monat, 2))
+print()
+print("Berechnete Kennzahlen")
+print("---------------------")
+print("Velocity:", round(velocity, 2), "ECTS pro Monat")
+print("Ziel-Velocity:", round(ziel_velocity, 2), "ECTS pro Monat")
 print("Prognose Restmonate:", round(prognose_restmonate, 1))
-print("Restworkload in Stunden:", restworkload_stunden)
+print("Prognose Gesamtstudienzeit:", round(prognose_gesamtmonate, 1), "Monate")
+print("Voraussichtliches Ende:", prognose_enddatum.strftime("%m.%Y"))
+
+if prognose_gesamtmonate <= regelstudienzeit_monate:
+    print("Status: innerhalb der Regelstudienzeit")
+else:
+    monate_hinter_plan = prognose_gesamtmonate - regelstudienzeit_monate
+    print("Status:", round(monate_hinter_plan, 1), "Monate hinter Plan")
