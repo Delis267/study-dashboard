@@ -1,0 +1,52 @@
+﻿@startuml
+skinparam classAttributeIconSize 0
+
+title Entity-Klassen Studien-Dashboard
+
+class Studium {
+  - studiengang: str
+  - startdatum: date
+  - zieldatum: date
+  - gesamtEcts: int
+  - zielNotendurchschnitt: float
+}
+
+class Modul {
+  - kurs_id: str
+  - kursname: str
+  - ects: int
+  - pruefungsform: Pruefungsform
+  - status: ModulStatus
+}
+
+class Pruefungsleistung {
+  - note: float
+  + isBestandenePruefungsleistung() : bool
+}
+
+enum Pruefungsform {
+  KLAUSUR
+  HAUSARBEIT
+  PORTFOLIO
+  PROJEKT
+  SEMINAR
+  PRAESENTATION
+  BACHELORARBEIT
+}
+
+enum ModulStatus {
+  OFFEN
+  IN_ARBEIT
+  FERTIG
+  ANERKANNT
+}
+
+Studium "1" *-- "0..*" Modul : enthaelt
+Modul "1" *-- "0..1" Pruefungsleistung : hat optional
+
+note right of Modul
+  Module sind nicht fest an Semester gebunden.
+  Der Fortschritt wird über den Status abgebildet.
+end note
+
+@enduml
