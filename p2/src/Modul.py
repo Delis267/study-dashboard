@@ -1,18 +1,14 @@
-from dataclasses import dataclass, field
-
+from dataclasses import dataclass
 from modul_status import ModulStatus
-from pruefungsform import Pruefungsform
 from pruefungsleistung import Pruefungsleistung
-
 
 @dataclass
 class Modul:
     kurs_id: str
     kursname: str
     ects: int
-    pruefungsform: Pruefungsform
+    pruefungsleistung: Pruefungsleistung
     status: ModulStatus = ModulStatus.OFFEN
-    pruefungsleistung: Pruefungsleistung = field(default_factory=Pruefungsleistung)
 
     def note_eintragen(self, note: float) -> None:
         self.pruefungsleistung.versuch_eintragen(note)
