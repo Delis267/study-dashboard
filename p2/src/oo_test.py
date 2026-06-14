@@ -1,10 +1,8 @@
 from datetime import date
-
-from p2.src.Modul import Modul
-from p2.src.Studium import ModulStatus
-from p2.src.Studium import Pruefungsform
-from p2.src.Studium import Studium
-
+from Studium import Studium
+from Modul import Modul
+from Pruefungsform import Pruefungsform
+from ModulStatus import ModulStatus
 
 # Testprogramm
 studium = Studium(
@@ -41,7 +39,8 @@ print("Studiengang:", studium.studiengang)
 print("Anzahl Module:", len(studium.module))
 print()
 
-studium.printModule()
+# neue, pythonische Namenskonvention
+studium.print_module()
 
 print("Erreichte ECTS:", studium.erreichte_ects)
 print("Fortschritt in Prozent:", round(studium.fortschritt_prozent, 2))
