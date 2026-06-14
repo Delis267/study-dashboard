@@ -1,10 +1,7 @@
-from p2.src.Studium import ModulStatus
-from p2.src.Pruefungsleistung import Pruefungsleistung
-from p2.src.Studium import Pruefungsform
-
-
-from dataclasses import dataclass
-
+from dataclasses import dataclass, field
+from Pruefungsleistung import Pruefungsleistung
+from ModulStatus import ModulStatus
+from Pruefungsform import Pruefungsform
 
 @dataclass
 class Modul:
@@ -13,34 +10,20 @@ class Modul:
     ects: int
     pruefungsform: Pruefungsform
     status: ModulStatus = ModulStatus.OFFEN
-    pruefungsleistung: Pruefungsleistung | None = None
+    pruefungsleistung: Pruefungsleistung = field(default_factory=Pruefungsleistung)
 
-    def add_pruefungsleistung(self, note: float) -> None:
-        if self.pruefungsleistung is not None and self.pruefungsleistung.ist_bestanden:
-            raise ValueError("Das Modul ist bereits bestanden.")
+    def note_eintragen(self, note: float) -> None:
+        # Delegation an Pruefungsleistung, keine Noten-/Versuchslogik im Modul
+        self.pruefungsleistung.versuch_eintragen(note)
+        self._status_aktualisieren()
 
-        if self.pruefungsleistung is None:
-            neuer_versuch = 1
-        else:
-            neuer_versuch = self.pruefungsleistung.versuch + 1
-
-        self.pruefungsleistung = Pruefungsleistung(
-            note=note,
-            versuch=neuer_versuch
-        )
-
+    def _status_aktualisieren(self) -> None:
         if self.pruefungsleistung.ist_bestanden:
             self.status = ModulStatus.FERTIG
+        elif not self.pruefungsleistung.versuche:
+            self.status = ModulStatus.OFFEN
         else:
             self.status = ModulStatus.IN_ARBEIT
 
-    def __repr__(self):
-        return f"""
-        Modul(
-                kurs_id={self.kurs_id!r},
-                kursname={self.kursname},
-                ects={self.ects},
-                pruefungsform={self.pruefungsform},
-                status={self.status},
-                pruefungsleistung={self.pruefungsleistung}
-        )"""
+    def __repr__(self) -> str:
+        return          f"Modul(kurs_id={self.kurs_id!r}, kursname={self.kursname!r}, ects={self.ects}"
