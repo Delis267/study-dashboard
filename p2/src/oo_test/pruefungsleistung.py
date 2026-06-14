@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
-from pruefungsform import Pruefungsform
-from pruefungsversuch import Pruefungsversuch
+
+from .pruefungsform import Pruefungsform
+from .pruefungsversuch import Pruefungsversuch
+
 
 @dataclass
 class Pruefungsleistung:
@@ -19,6 +21,13 @@ class Pruefungsleistung:
     @property
     def versuche_anzahl(self) -> int:
         return len(self._versuche)
+
+    @property
+    def versuche(self) -> tuple[Pruefungsversuch, ...]:
+        '''
+        Gibt eine unveränderliche Ansicht der Versuche zurück.
+        '''
+        return tuple(self._versuche)
 
     @property
     def letzter_versuch(self) -> Pruefungsversuch | None:

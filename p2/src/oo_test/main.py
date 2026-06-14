@@ -1,8 +1,10 @@
 from datetime import date
-from modul import Modul
-from pruefungsform import Pruefungsform
-from pruefungsleistung import Pruefungsleistung
-from studium import Studium
+
+from .modul import Modul
+from .pruefungsform import Pruefungsform
+from .pruefungsleistung import Pruefungsleistung
+from .studium import Studium
+
 
 studium = Studium(
     studiengang="Software Engineering",
@@ -31,11 +33,9 @@ print("==== Studiumsbeginn - 2 Module ohne Versuche ====")
 studium.status_ausgeben()
 
 modul_eins.note_eintragen(5.0)
-print("==== Nach erster Prüfung mit Note 5.0 ====")
+print("==== Nach erster Pruefung mit Note 5.0 ====")
 studium.status_ausgeben()
 
 modul_eins.note_eintragen(2.3)
-print("==== Nach zweiter Prüfung mit Note 2.3 ====")
+print("==== Nach zweiter Pruefung mit Note 2.3 ====")
 studium.status_ausgeben()
-
-

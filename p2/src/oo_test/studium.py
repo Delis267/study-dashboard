@@ -1,7 +1,9 @@
 from dataclasses import dataclass, field
 from datetime import date
-from modul import Modul
-from modul_status import ModulStatus
+
+from .modul import Modul
+from .modul_status import ModulStatus
+
 
 @dataclass
 class Studium:
@@ -40,4 +42,4 @@ class Studium:
         print("Module:")
         for modul in self.module:
             print("-", modul)
-        print()    
+        print()

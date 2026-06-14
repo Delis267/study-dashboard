@@ -1,6 +1,8 @@
 from dataclasses import dataclass
-from modul_status import ModulStatus
-from pruefungsleistung import Pruefungsleistung
+
+from .modul_status import ModulStatus
+from .pruefungsleistung import Pruefungsleistung
+
 
 @dataclass
 class Modul:
@@ -17,7 +19,7 @@ class Modul:
     def _status_aktualisieren(self) -> None:
         if self.status == ModulStatus.ANERKANNT:
             return
-        if not self.pruefungsleistung._versuche:
+        if not self.pruefungsleistung.versuche:
             self.status = ModulStatus.OFFEN
         elif self.pruefungsleistung.ist_bestanden:
             self.status = ModulStatus.FERTIG
