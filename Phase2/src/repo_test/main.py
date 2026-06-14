@@ -37,7 +37,7 @@ studium.modul_hinzufuegen(modul_zwei)
 repository.speichern(studium)
 studium.status_ausgeben()
 
-print("==== Laden und Noten Einstragen und wieder speichern ====")
+print("==== Laden und Noten eintragen und wieder speichern ====")
 geladenes_studium = repository.laden()
 geladenes_studium.module[0].note_eintragen(5.0)
 geladenes_studium.module[0].note_eintragen(2.3)
