@@ -1,10 +1,10 @@
 from dataclasses import dataclass, field
-
+from pruefungsform import Pruefungsform
 from pruefungsversuch import Pruefungsversuch
-
 
 @dataclass
 class Pruefungsleistung:
+    pruefungsform: Pruefungsform
     _MAX_VERSUCHE = 3
     _versuche: list[Pruefungsversuch] = field(default_factory=list, init=False)
 
@@ -35,6 +35,7 @@ class Pruefungsleistung:
     def __str__(self) -> str:
         return (
             f"Pruefungsleistung("
+            f"pruefungsform={self.pruefungsform}, "
             f"versuche={self.versuche_anzahl}, "
             f"letzter_versuch={self.letzter_versuch})"
         )
