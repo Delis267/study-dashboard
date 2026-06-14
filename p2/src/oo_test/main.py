@@ -5,7 +5,6 @@ from .pruefungsform import Pruefungsform
 from .pruefungsleistung import Pruefungsleistung
 from .studium import Studium
 
-
 studium = Studium(
     studiengang="Software Engineering",
     startdatum=date(2025, 1, 1),
