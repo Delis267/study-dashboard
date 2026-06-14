@@ -1,7 +1,9 @@
 from dataclasses import dataclass, field
-from Pruefungsleistung import Pruefungsleistung
-from ModulStatus import ModulStatus
-from Pruefungsform import Pruefungsform
+
+from modul_status import ModulStatus
+from pruefungsform import Pruefungsform
+from pruefungsleistung import Pruefungsleistung
+
 
 @dataclass
 class Modul:
@@ -13,17 +15,21 @@ class Modul:
     pruefungsleistung: Pruefungsleistung = field(default_factory=Pruefungsleistung)
 
     def note_eintragen(self, note: float) -> None:
-        # Delegation an Pruefungsleistung, keine Noten-/Versuchslogik im Modul
         self.pruefungsleistung.versuch_eintragen(note)
         self._status_aktualisieren()
 
     def _status_aktualisieren(self) -> None:
-        if self.pruefungsleistung.ist_bestanden:
-            self.status = ModulStatus.FERTIG
-        elif not self.pruefungsleistung.versuche:
+        if self.status == ModulStatus.ANERKANNT:
+            return
+        if not self.pruefungsleistung._versuche:
             self.status = ModulStatus.OFFEN
+        elif self.pruefungsleistung.ist_bestanden:
+            self.status = ModulStatus.FERTIG
         else:
             self.status = ModulStatus.IN_ARBEIT
 
-    def __repr__(self) -> str:
-        return          f"Modul(kurs_id={self.kurs_id!r}, kursname={self.kursname!r}, ects={self.ects}"
+    def __str__(self) -> str:
+        return (
+            f"Modul(id={self.kurs_id}, name={self.kursname}, "
+            f"status={self.status}, {self.pruefungsleistung})"
+        )
