@@ -17,6 +17,8 @@ class Modul:
         self._status_aktualisieren()
 
     def _status_aktualisieren(self) -> None:
+        '''Aktualisiert den Status des Moduls basierend auf der Prüfungsleistung.
+        '''
         if self.status == ModulStatus.ANERKANNT:
             return
         if not self.pruefungsleistung.versuche:
