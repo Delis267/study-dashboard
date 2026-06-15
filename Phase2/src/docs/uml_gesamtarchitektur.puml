@@ -1,0 +1,54 @@
+@startuml
+skinparam classAttributeIconSize 0
+left to right direction
+
+title Gesamtarchitektur Studien-Dashboard - Phase 2
+
+package "Eingehender Adapter" {
+  class DashboardTkinterApp
+}
+
+package "Ausgehender Adapter" {
+  class JsonStudiumRepository
+}
+
+rectangle "Anwendungskern" {
+  package "Input-Port" {
+    interface StudienDashboardInputPort
+  }
+
+  package "Anwendungsschicht" {
+    class StudienDashboardService
+  }
+
+  package "Output-Port" {
+    interface StudiumRepositoryPort
+  }
+
+  package "Domaene" {
+    class Studium
+    class Modul
+    class Pruefungsleistung
+    class Pruefungsversuch
+
+    enum ModulStatus
+    enum Pruefungsform
+  }
+}
+
+DashboardTkinterApp --> StudienDashboardInputPort : nutzt
+StudienDashboardService ..|> StudienDashboardInputPort : implementiert
+
+StudienDashboardService --> StudiumRepositoryPort : verwendet
+JsonStudiumRepository ..|> StudiumRepositoryPort : implementiert
+
+StudienDashboardService --> Studium : verwaltet
+
+Studium "1" *-- "0..*" Modul : enthaelt
+Modul "1" *-- "1" Pruefungsleistung : besitzt
+Pruefungsleistung "1" *-- "0..3" Pruefungsversuch : verwaltet
+
+Modul --> ModulStatus : verwendet
+Pruefungsleistung --> Pruefungsform : verwendet
+
+@enduml
