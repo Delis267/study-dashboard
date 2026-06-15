@@ -1,0 +1,84 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+title Entity-Klassen Studien-Dashboard - Phase 2
+
+class Studium {
+  - studiengang: str
+  - startdatum: date
+  - zieldatum: date
+  - gesamt_ects: int
+  - ziel_notendurchschnitt: float
+  - module: list[Modul]
+  --
+  + modul_hinzufuegen(modul: Modul): None
+  + erreichte_ects: int <<property>>
+  + fortschritt_prozent: float <<property>>
+}
+
+class Modul {
+  - kurs_id: str
+  - kursname: str
+  - ects: int
+  - status: ModulStatus
+  - pruefungsleistung: Pruefungsleistung
+  --
+  + note_eintragen(note: float): None
+  - _status_aktualisieren(): None
+}
+
+class Pruefungsleistung {
+  - pruefungsform: Pruefungsform
+  - _MAX_VERSUCHE: int = 3
+  - _versuche: list[Pruefungsversuch]
+  --
+  + versuch_eintragen(note: float): None
+  + versuche_anzahl: int <<property>>
+  + letzter_versuch: Pruefungsversuch | None <<property>>
+  + ist_bestanden: bool <<property>>
+}
+
+class Pruefungsversuch {
+  - note: float
+  --
+  + ist_bestanden: bool <<property>>
+}
+
+enum Pruefungsform {
+  KLAUSUR
+  HAUSARBEIT
+  PORTFOLIO
+  PROJEKT
+  SEMINAR
+  PRAESENTATION
+  BACHELORARBEIT
+}
+
+enum ModulStatus {
+  OFFEN
+  IN_ARBEIT
+  FERTIG
+  ANERKANNT
+}
+
+Studium "1" *-- "0..*" Modul : enthaelt
+Modul "1" *-- "1" Pruefungsleistung : besitzt
+Pruefungsleistung "1" *-- "0..3" Pruefungsversuch : verwaltet
+
+Pruefungsleistung --> Pruefungsform : verwendet
+Modul --> ModulStatus : verwendet
+
+note top of Pruefungsleistung
+  Die Pruefungsleistung kapselt die pruefungsbezogene Logik:
+  Sie verwaltet die Pruefungsform und die Pruefungsversuche,
+  begrenzt die Anzahl der Versuche auf maximal drei
+  und entscheidet, ob die Pruefung bestanden wurde.
+end note
+
+note left of Pruefungsversuch
+  Der Pruefungsversuch speichert keine Versuchsnummer.
+  Die Anzahl und Reihenfolge ergeben sich aus der Liste
+  in Pruefungsleistung.
+end note
+
+@enduml

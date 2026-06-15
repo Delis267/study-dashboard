@@ -1,0 +1,28 @@
+{
+    "studiengang": "Software Engineering",
+    "startdatum": "2025-01-01",
+    "zieldatum": "2028-01-01",
+    "gesamt_ects": 10,
+    "ziel_notendurchschnitt": 2.0,
+    "module": [
+        {
+            "kurs_id": "k1",
+            "kursname": "Objektorientierte Programmierung mit Python",
+            "ects": 5,
+            "status": "FERTIG",
+            "pruefungsform": "PORTFOLIO",
+            "noten": [
+                5.0,
+                2.3
+            ]
+        },
+        {
+            "kurs_id": "k2",
+            "kursname": "Datenstrukturen und Algorithmen",
+            "ects": 5,
+            "status": "OFFEN",
+            "pruefungsform": "KLAUSUR",
+            "noten": []
+        }
+    ]
+}
