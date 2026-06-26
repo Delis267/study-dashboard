@@ -30,6 +30,7 @@ class StudienAnalyseService(StudienAnalyseInputPort):
             ziel_notendurchschnitt=studium.ziel_notendurchschnitt,
             ziel_notendurchschnitt_erreicht=studium.ziel_notendurchschnitt_erreicht,
             velocity_ects_pro_monat=studium.velocity(stichtag),
+            ziel_velocity_ects_pro_monat=studium.ziel_velocity,
             prognostiziertes_ende=studium.prognostiziertes_ende(stichtag),
             module=[
                 ModulDaten(
