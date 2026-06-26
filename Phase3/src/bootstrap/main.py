@@ -10,13 +10,15 @@ from infrastructure.persistence.json_studium_repository import JsonStudiumReposi
 class Application:
     def __init__(self) -> None:
         datenpfad = Path(__file__).resolve().parents[2] / "data" / "studium.json"
+
+        print("Starte Anwendung mit Datenpfad für das Json-Repository:", datenpfad)
         repository = JsonStudiumRepository(datenpfad)
         self.bearbeiten_service = StudiumBearbeitenService(repository)
         self.analyse_service = StudienAnalyseService(repository)
 
     def demo_starten(self) -> None:
         dashboard_daten = self.analyse_service.dashboard_daten_abrufen(
-            stichtag=date(2025, 7, 1),
+            stichtag=date(2026, 6, 27),
         )
 
         print("Studiengang:", dashboard_daten.studiengang)
