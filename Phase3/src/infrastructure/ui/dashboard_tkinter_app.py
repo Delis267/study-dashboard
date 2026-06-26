@@ -574,12 +574,16 @@ class ModulBearbeitenDialog:
         self.ects_var = tk.StringVar(value=str(modul.ects))
         self.pruefungsform_var = tk.StringVar(
             value=(
-                Pruefungsform.KLAUSUR.value
-                if modul.pruefungsform is None
-                else modul.pruefungsform
+                "-" if modul.pruefungsform is None else modul.pruefungsform
             )
         )
-        self.note_var = tk.StringVar(value="" if modul.note is None else str(modul.note))
+        self.note_var = tk.StringVar(
+            value=(
+                "anerkannt"
+                if modul.status == ModulStatus.ANERKANNT
+                else "" if modul.note is None else str(modul.note)
+            )
+        )
 
         frame = ttk.Frame(self.dialog, padding=14)
         frame.pack(fill="both", expand=True)
@@ -657,7 +661,11 @@ class ModulBearbeitenDialog:
             messagebox.showerror("Eingabe pruefen", "Der Kursname ist ein Pflichtfeld.")
             return
 
-        note = None if self.note_var.get() == "" else float(self.note_var.get())
+        note = (
+            None
+            if self.modul.status == ModulStatus.ANERKANNT or self.note_var.get() == ""
+            else float(self.note_var.get())
+        )
         self.ergebnis = {
             "typ": "speichern",
             "kursname": kursname,
