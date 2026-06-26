@@ -9,6 +9,23 @@ from domain.pruefungsform import Pruefungsform
 from domain.pruefungsversuch import ERLAUBTE_NOTEN
 
 
+def popup_am_cursor_platzieren(
+    dialog: tk.Toplevel,
+    parent: tk.Tk,
+    breite: int = 640,
+) -> None:
+    dialog.update_idletasks()
+    hoehe = dialog.winfo_reqheight()
+    x = parent.winfo_pointerx()
+    y = parent.winfo_pointery()
+    max_x = max(dialog.winfo_screenwidth() - breite - 12, 0)
+    max_y = max(dialog.winfo_screenheight() - hoehe - 48, 0)
+    x = min(max(x, 12), max_x)
+    y = min(max(y, 12), max_y)
+    dialog.minsize(breite, hoehe)
+    dialog.geometry(f"{breite}x{hoehe}+{x}+{y}")
+
+
 class DashboardTkinterApp:
     KENNZAHL_BOX_HOEHE = 104
 
@@ -292,6 +309,7 @@ class DashboardTkinterApp:
         self.kennzahl_boxen["ECTS"]["sekundaer"].configure(
             text=f"{daten.fortschritt_prozent} % fertig\n{daten.offene_ects} ECTS offen"
         )
+
         notenschnitt = "-" if daten.notendurchschnitt is None else daten.notendurchschnitt
         ziel_erreicht = self._zieltext(daten.ziel_notendurchschnitt_erreicht)
         self.kennzahl_boxen["Notenschnitt"]["primaer"].configure(
@@ -305,8 +323,9 @@ class DashboardTkinterApp:
         )
         prognose = "-" if daten.prognostiziertes_ende is None else daten.prognostiziertes_ende
         self.kennzahl_boxen["Velocity"]["sekundaer"].configure(
-            text="Aktuelle Lerngeschwindigkeit"
+            text=f"Ziel: {daten.ziel_velocity_ects_pro_monat} ECTS/Monat\n{self._velocity_hinweis(daten)}"
         )
+
         self.kennzahl_boxen["Prognose"]["primaer"].configure(text=f"Ende: {prognose}")
         self.kennzahl_boxen["Prognose"]["sekundaer"].configure(
             text=self._prognose_hinweis(daten)
@@ -405,6 +424,12 @@ class DashboardTkinterApp:
             return "erreicht"
         return "nicht erreicht"
 
+    def _velocity_hinweis(self, daten: DashboardDaten) -> str:
+        if daten.ziel_velocity_ects_pro_monat <= daten.velocity_ects_pro_monat:
+            return "erreicht"
+        if daten.ziel_velocity_ects_pro_monat >= daten.ziel_velocity_ects_pro_monat:
+            return "nicht erreicht"
+
     def _prognose_hinweis(self, daten: DashboardDaten) -> str:
         if daten.prognostiziertes_ende is None:
             return "Noch keine Prognose"
@@ -487,6 +512,7 @@ class ModulHinzufuegenDialog:
         frame.columnconfigure(1, weight=1)
         self.dialog.bind("<Return>", lambda _event: self._speichern())
         self.dialog.bind("<Escape>", lambda _event: self.dialog.destroy())
+        popup_am_cursor_platzieren(self.dialog, parent)
 
     def anzeigen(self) -> dict[str, object] | None:
         self.dialog.wait_window()
@@ -559,7 +585,7 @@ class ModulBearbeitenDialog:
         frame.pack(fill="both", expand=True)
 
         ttk.Label(frame, text="ID").grid(row=0, column=0, sticky="w", pady=4)
-        self._readonly_entry(frame, self.kurs_id_var).grid(
+        ttk.Entry(frame, textvariable=self.kurs_id_var).grid(
             row=0, column=1, sticky="ew", pady=4, padx=(8, 0)
         )
         ttk.Label(frame, text="Kursname").grid(row=1, column=0, sticky="w", pady=4)
@@ -605,6 +631,7 @@ class ModulBearbeitenDialog:
         frame.columnconfigure(1, weight=1)
         self.dialog.bind("<Return>", lambda _event: self._speichern())
         self.dialog.bind("<Escape>", lambda _event: self.dialog.destroy())
+        popup_am_cursor_platzieren(self.dialog, parent)
 
     def anzeigen(self) -> dict[str, object] | None:
         self.dialog.wait_window()

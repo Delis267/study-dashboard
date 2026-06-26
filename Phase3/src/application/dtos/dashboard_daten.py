@@ -28,6 +28,7 @@ class DashboardDaten:
     ziel_notendurchschnitt: float
     ziel_notendurchschnitt_erreicht: bool | None
     velocity_ects_pro_monat: float
+    ziel_velocity_ects_pro_monat: float
     prognostiziertes_ende: date | None
     module: list[ModulDaten]
 
