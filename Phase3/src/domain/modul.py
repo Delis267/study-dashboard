@@ -10,11 +10,49 @@ class Modul:
     kursname: str
     ects: int
     pruefungsleistung: Pruefungsleistung | None
-    status: ModulStatus = ModulStatus.OFFEN
+
+    @classmethod
+    def regulaer(
+        cls,
+        kurs_id: str,
+        kursname: str,
+        ects: int,
+        pruefungsform: Pruefungsform,
+    ) -> "Modul":
+        return cls(
+            kurs_id=kurs_id,
+            kursname=kursname,
+            ects=ects,
+            pruefungsleistung=Pruefungsleistung(pruefungsform),
+        )
+
+    @classmethod
+    def anerkannt(
+        cls,
+        kurs_id: str,
+        kursname: str,
+        ects: int,
+    ) -> "Modul":
+        return cls(
+            kurs_id=kurs_id,
+            kursname=kursname,
+            ects=ects,
+            pruefungsleistung=None,
+        )
 
     @property
     def ist_anerkannt(self) -> bool:
-        return self.status == ModulStatus.ANERKANNT
+        return self.pruefungsleistung is None
+
+    @property
+    def status(self) -> ModulStatus:
+        if self.ist_anerkannt:
+            return ModulStatus.ANERKANNT
+        if not self.pruefungsleistung.versuche:
+            return ModulStatus.OFFEN
+        if self.pruefungsleistung.ist_bestanden:
+            return ModulStatus.FERTIG
+        return ModulStatus.IN_ARBEIT
 
     def __post_init__(self) -> None:
         if not self.kurs_id.strip():
@@ -23,24 +61,18 @@ class Modul:
             raise ValueError("Der Kursname darf nicht leer sein.")
         if self.ects <= 0:
             raise ValueError("ECTS muessen groesser als 0 sein.")
-        if self.status == ModulStatus.ANERKANNT and self.pruefungsleistung is not None:
-            raise ValueError("Anerkannte Module haben keine Pruefungsleistung.")
-        if self.status != ModulStatus.ANERKANNT and self.pruefungsleistung is None:
-            raise ValueError("Nicht anerkannte Module brauchen eine Pruefungsleistung.")
 
     def note_eintragen(self, note: float) -> None:
         if self.ist_anerkannt:
             raise ValueError("Fuer anerkannte Module kann keine Note eingetragen werden.")
 
         self.pruefungsleistung.versuch_eintragen(note)
-        self._status_aktualisieren()
 
     def pruefungsform_aendern(self, pruefungsform: Pruefungsform) -> None:
         if self.ist_anerkannt:
             raise ValueError("Fuer anerkannte Module kann die Pruefungsform nicht geaendert werden.")
 
         self.pruefungsleistung.pruefungsform_aendern(pruefungsform)
-        self._status_aktualisieren()
 
     def basisdaten_aendern(
         self,
@@ -62,7 +94,6 @@ class Modul:
             raise ValueError("Module mit Pruefungsversuchen koennen nicht anerkannt werden.")
 
         self.pruefungsleistung = None
-        self.status = ModulStatus.ANERKANNT
             
     @property
     def aktuelle_note(self) -> float | None:
@@ -71,18 +102,6 @@ class Modul:
         if not self.pruefungsleistung.ist_bestanden:
             return None
         return self.pruefungsleistung.letzter_versuch.note
-
-    def _status_aktualisieren(self) -> None:
-        if self.status == ModulStatus.ANERKANNT:
-            return
-        if self.pruefungsleistung is None:
-            raise ValueError("Nicht anerkannte Module brauchen eine Pruefungsleistung.")
-        if not self.pruefungsleistung.versuche:
-            self.status = ModulStatus.OFFEN
-        elif self.pruefungsleistung.ist_bestanden:
-            self.status = ModulStatus.FERTIG
-        else:
-            self.status = ModulStatus.IN_ARBEIT
 
     def __str__(self) -> str:
         return (

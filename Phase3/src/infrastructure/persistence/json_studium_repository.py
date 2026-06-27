@@ -4,9 +4,7 @@ from pathlib import Path
 
 from application.ports.studium_repository_port import StudiumRepositoryPort
 from domain.modul import Modul
-from domain.modul_status import ModulStatus
 from domain.pruefungsform import Pruefungsform
-from domain.pruefungsleistung import Pruefungsleistung
 from domain.studium import Studium
 
 
@@ -60,35 +58,27 @@ class JsonStudiumRepository(StudiumRepositoryPort):
             "kurs_id": modul.kurs_id,
             "kursname": modul.kursname,
             "ects": modul.ects,
-            "status": modul.status.name,
             "pruefungsleistung": pruefungsleistung,
         }
 
     def _modul_aus_dict(self, daten: dict) -> Modul:
-        status = ModulStatus[daten["status"]]
         pruefungsleistung_daten = daten["pruefungsleistung"]
 
-        if status == ModulStatus.ANERKANNT:
-            return Modul(
-                kurs_id=daten["kurs_id"],
-                kursname=daten["kursname"],
-                ects=daten["ects"],
-                pruefungsleistung=None,
-                status=ModulStatus.ANERKANNT,
+        if pruefungsleistung_daten is None:
+            return Modul.anerkannt(
+                daten["kurs_id"],
+                daten["kursname"],
+                daten["ects"],
             )
 
-        pruefungsleistung = Pruefungsleistung(
-            Pruefungsform[pruefungsleistung_daten["pruefungsform"]]
-        )
-        modul = Modul(
-            kurs_id=daten["kurs_id"],
-            kursname=daten["kursname"],
-            ects=daten["ects"],
-            pruefungsleistung=pruefungsleistung,
+        modul = Modul.regulaer(
+            daten["kurs_id"],
+            daten["kursname"],
+            daten["ects"],
+            Pruefungsform[pruefungsleistung_daten["pruefungsform"]],
         )
 
         for versuch_daten in pruefungsleistung_daten["versuche"]:
             modul.note_eintragen(versuch_daten["note"])
 
-        modul.status = status
         return modul

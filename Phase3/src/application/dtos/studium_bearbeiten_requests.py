@@ -1,8 +1,5 @@
 from dataclasses import dataclass
 from domain.modul import Modul
-from domain.modul_status import ModulStatus
-from domain.pruefungsform import Pruefungsform
-from domain.pruefungsleistung import Pruefungsleistung
 from domain.pruefungsform import Pruefungsform
 
 
@@ -14,23 +11,23 @@ class ModulHinzufuegenRequest:
     pruefungsform: Pruefungsform | None
     ist_anerkannt: bool = False
     
-    def to_modul(self):
+    def to_modul(self) -> Modul:
         if self.ist_anerkannt:
-            modul = Modul(
-                kurs_id=self.kurs_id,
-                kursname=self.kursname,
-                ects=self.ects,
-                pruefungsleistung=None,
-                status=ModulStatus.ANERKANNT,
+            return Modul.anerkannt(
+                self.kurs_id,
+                self.kursname,
+                self.ects,
             )
-        else:
-            modul = Modul(
-                kurs_id=self.kurs_id,
-                kursname=self.kursname,
-                ects=self.ects,
-                pruefungsleistung=Pruefungsleistung(self.pruefungsform),
-            )
-        return modul
+
+        if self.pruefungsform is None:
+            raise ValueError("Nicht anerkannte Module brauchen eine Pruefungsform.")
+
+        return Modul.regulaer(
+            self.kurs_id,
+            self.kursname,
+            self.ects,
+            self.pruefungsform,
+        )
     
 @dataclass(frozen=True)
 class ModulBearbeitenRequest:

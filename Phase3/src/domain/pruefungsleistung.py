@@ -4,16 +4,22 @@ from .pruefungsform import Pruefungsform
 from .pruefungsversuch import Pruefungsversuch
 
 
+MAX_VERSUCHE = 3
+
+
 @dataclass
 class Pruefungsleistung:
     pruefungsform: Pruefungsform
-    _MAX_VERSUCHE = 3
     _versuche: list[Pruefungsversuch] = field(default_factory=list, init=False)
+
+    def __post_init__(self) -> None:
+        if self.pruefungsform is None:
+            raise ValueError("Eine Pruefungsleistung braucht eine Pruefungsform.")
 
     def versuch_eintragen(self, note: float) -> None:
         if self.ist_bestanden:
             raise ValueError("Weitere Versuche sind nicht erlaubt: Pruefung bereits bestanden.")
-        if len(self._versuche) >= self._MAX_VERSUCHE:
+        if len(self._versuche) >= MAX_VERSUCHE:
             raise ValueError("Maximale Anzahl Versuche erreicht.")
 
         self._versuche.append(Pruefungsversuch(note=note))
@@ -44,7 +50,7 @@ class Pruefungsleistung:
         return (
             self.letzter_versuch is not None
             and not self.letzter_versuch.ist_bestanden
-            and len(self._versuche) >= self._MAX_VERSUCHE
+            and len(self._versuche) >= MAX_VERSUCHE
         )
 
     def __str__(self) -> str:

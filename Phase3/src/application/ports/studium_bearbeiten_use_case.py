@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 from application.dtos.studium_bearbeiten_requests import ModulBearbeitenRequest, ModulHinzufuegenRequest
 from domain.pruefungsform import Pruefungsform
 
-
 class StudiumBearbeitenUseCase(ABC):
     @abstractmethod
     def modul_hinzufuegen(self, request: ModulHinzufuegenRequest) -> None:
