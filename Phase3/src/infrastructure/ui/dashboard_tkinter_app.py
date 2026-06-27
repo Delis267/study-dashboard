@@ -1,9 +1,10 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
 
-from application.dtos.dashboard_daten import DashboardDaten, ModulDaten
-from application.ports.studien_analyse_input_port import StudienAnalyseInputPort
-from application.ports.studium_bearbeiten_input_port import StudiumBearbeitenInputPort
+from application.dtos.dashboard_daten_response import DashboardDatenResponse, ModulDaten
+from application.dtos.studium_bearbeiten_requests import ModulHinzufuegenRequest
+from application.ports.studien_analyse_use_case import StudienAnalyseUseCase
+from application.ports.studium_bearbeiten_use_case import StudiumBearbeitenUseCase
 from domain.modul_status import ModulStatus
 from domain.pruefungsform import Pruefungsform
 from domain.pruefungsversuch import ERLAUBTE_NOTEN
@@ -31,8 +32,8 @@ class DashboardTkinterApp:
 
     def __init__(
         self,
-        analyse_port: StudienAnalyseInputPort,
-        bearbeiten_port: StudiumBearbeitenInputPort,
+        analyse_port: StudienAnalyseUseCase,
+        bearbeiten_port: StudiumBearbeitenUseCase,
     ) -> None:
         self.analyse_port = analyse_port
         self.bearbeiten_port = bearbeiten_port
@@ -232,11 +233,13 @@ class DashboardTkinterApp:
 
         try:
             self.bearbeiten_port.modul_hinzufuegen(
-                kurs_id=modul["kurs_id"],
-                kursname=modul["kursname"],
-                ects=modul["ects"],
-                pruefungsform=modul["pruefungsform"],
-                ist_anerkannt=modul["ist_anerkannt"],
+                ModulHinzufuegenRequest(
+                    kurs_id=modul["kurs_id"],
+                    kursname=modul["kursname"],
+                    ects=modul["ects"],
+                    pruefungsform=modul["pruefungsform"],
+                    ist_anerkannt=modul["ist_anerkannt"],
+                )
             )
             if modul["note"] is not None:
                 self.bearbeiten_port.modul_bearbeiten(
@@ -289,7 +292,7 @@ class DashboardTkinterApp:
         modul = self._module[str(zeile)]
         self.modul_bearbeiten(modul)
 
-    def _kennzahlen_aktualisieren(self, daten: DashboardDaten) -> None:
+    def _kennzahlen_aktualisieren(self, daten: DashboardDatenResponse) -> None:
         self.studieninfo_labels["Studiengang"].configure(
             text=f"o {daten.studiengang}"
         )
@@ -332,7 +335,7 @@ class DashboardTkinterApp:
         )
         self._legende_zeichnen(daten)
 
-    def _donut_zeichnen(self, daten: DashboardDaten) -> None:
+    def _donut_zeichnen(self, daten: DashboardDatenResponse) -> None:
         self.donut_canvas.delete("all")
         farben = self._status_farben()
         werte = [
@@ -369,7 +372,7 @@ class DashboardTkinterApp:
         self.donut_canvas.create_oval(53, 53, 97, 97, fill="white", outline="white")
         self.donut_canvas.create_text(75, 75, text=f"{daten.erreichte_ects}\nECTS")
 
-    def _legende_zeichnen(self, daten: DashboardDaten) -> None:
+    def _legende_zeichnen(self, daten: DashboardDatenResponse) -> None:
         self.legende_canvas.delete("all")
         farben = self._status_farben()
         eintraege = (
@@ -436,13 +439,13 @@ class DashboardTkinterApp:
             return "erreicht"
         return "nicht erreicht"
 
-    def _velocity_hinweis(self, daten: DashboardDaten) -> str:
+    def _velocity_hinweis(self, daten: DashboardDatenResponse) -> str:
         if daten.ziel_velocity_ects_pro_monat <= daten.velocity_ects_pro_monat:
             return "erreicht"
         if daten.ziel_velocity_ects_pro_monat >= daten.ziel_velocity_ects_pro_monat:
             return "nicht erreicht"
 
-    def _prognose_hinweis(self, daten: DashboardDaten) -> str:
+    def _prognose_hinweis(self, daten: DashboardDatenResponse) -> str:
         if daten.prognostiziertes_ende is None:
             return "Noch keine Prognose"
         if daten.prognostiziertes_ende <= daten.zieldatum:

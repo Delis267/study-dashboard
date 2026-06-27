@@ -4,38 +4,34 @@ from domain.pruefungsform import Pruefungsform
 from domain.pruefungsleistung import Pruefungsleistung
 from domain.studium import Studium
 
-from application.ports.studium_bearbeiten_input_port import StudiumBearbeitenInputPort
+from application.dtos.studium_bearbeiten_requests import ModulHinzufuegenRequest
+from application.ports.studium_bearbeiten_use_case import StudiumBearbeitenUseCase
 from application.ports.studium_repository_port import StudiumRepositoryPort
 
 
-class StudiumBearbeitenService(StudiumBearbeitenInputPort):
+class StudiumBearbeitenService(StudiumBearbeitenUseCase):
     def __init__(self, repository: StudiumRepositoryPort) -> None:
         self.repository = repository
 
-    def modul_hinzufuegen(
-        self,
-        kurs_id: str,
-        kursname: str,
-        ects: int,
-        pruefungsform: Pruefungsform | None,
-        ist_anerkannt: bool = False,
-    ) -> None:
+    def modul_hinzufuegen(self, request: ModulHinzufuegenRequest) -> None:
         studium = self.repository.laden()
-        if ist_anerkannt or pruefungsform is None:
+
+        if request.ist_anerkannt:
             modul = Modul(
-                kurs_id=kurs_id,
-                kursname=kursname,
-                ects=ects,
+                kurs_id=request.kurs_id,
+                kursname=request.kursname,
+                ects=request.ects,
                 pruefungsleistung=None,
                 status=ModulStatus.ANERKANNT,
             )
         else:
             modul = Modul(
-                kurs_id=kurs_id,
-                kursname=kursname,
-                ects=ects,
-                pruefungsleistung=Pruefungsleistung(pruefungsform),
+                kurs_id=request.kurs_id,
+                kursname=request.kursname,
+                ects=request.ects,
+                pruefungsleistung=Pruefungsleistung(request.pruefungsform),
             )
+
         studium.modul_hinzufuegen(modul)
         self.repository.speichern(studium)
 
