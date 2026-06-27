@@ -7,7 +7,6 @@ from pathlib import Path
 from domain.modul import Modul
 from domain.modul_status import ModulStatus
 from domain.pruefungsform import Pruefungsform
-from domain.pruefungsleistung import Pruefungsleistung
 from domain.studium import Studium
 from infrastructure.persistence.json_studium_repository import JsonStudiumRepository
 
@@ -24,18 +23,16 @@ class JsonStudiumRepositoryTest(unittest.TestCase):
                 gesamt_ects=20,
                 ziel_notendurchschnitt=2.0,
             )
-            modul = Modul(
-                kurs_id="OOP",
-                kursname="Objektorientierte Programmierung",
-                ects=5,
-                pruefungsleistung=Pruefungsleistung(Pruefungsform.PORTFOLIO),
+            modul = Modul.regulaer(
+                "OOP",
+                "Objektorientierte Programmierung",
+                5,
+                Pruefungsform.PORTFOLIO,
             )
-            anerkannt = Modul(
-                kurs_id="MATHE",
-                kursname="Mathematik Grundlagen",
-                ects=5,
-                pruefungsleistung=None,
-                status=ModulStatus.ANERKANNT,
+            anerkannt = Modul.anerkannt(
+                "MATHE",
+                "Mathematik Grundlagen",
+                5,
             )
 
             studium.modul_hinzufuegen(modul)
@@ -53,6 +50,7 @@ class JsonStudiumRepositoryTest(unittest.TestCase):
                 gespeicherte_daten["module"][0]["pruefungsleistung"]["versuche"],
             )
             self.assertIsNone(gespeicherte_daten["module"][1]["pruefungsleistung"])
+            self.assertNotIn("status", gespeicherte_daten["module"][0])
 
             geladenes_studium = repository.laden()
 
@@ -65,4 +63,3 @@ class JsonStudiumRepositoryTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

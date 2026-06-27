@@ -1,7 +1,4 @@
 from domain.modul import Modul
-from domain.modul_status import ModulStatus
-from domain.pruefungsform import Pruefungsform
-from domain.pruefungsleistung import Pruefungsleistung
 from domain.studium import Studium
 
 from application.dtos.studium_bearbeiten_requests import ModulBearbeitenRequest, ModulHinzufuegenRequest

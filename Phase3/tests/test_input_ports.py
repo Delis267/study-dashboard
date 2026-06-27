@@ -1,9 +1,12 @@
 import unittest
 from datetime import date
 
-from application.dtos.studium_bearbeiten_requests import ModulHinzufuegenRequest
-from application.ports.studien_analyse_input_port import StudienAnalyseInputPort
-from application.ports.studium_bearbeiten_input_port import StudiumBearbeitenInputPort
+from application.dtos.studium_bearbeiten_requests import (
+    ModulBearbeitenRequest,
+    ModulHinzufuegenRequest,
+)
+from application.ports.studien_analyse_use_case import StudienAnalyseUseCase
+from application.ports.studium_bearbeiten_use_case import StudiumBearbeitenUseCase
 from application.use_cases.studien_analyse_service import StudienAnalyseService
 from application.use_cases.studium_bearbeiten_service import StudiumBearbeitenService
 from domain.pruefungsform import Pruefungsform
@@ -26,7 +29,7 @@ class InMemoryStudiumRepository:
 class InputPortsTest(unittest.TestCase):
     def test_bearbeiten_service_implementiert_frontend_port(self) -> None:
         repository = InMemoryStudiumRepository(self._studium())
-        service: StudiumBearbeitenInputPort = StudiumBearbeitenService(repository)
+        service: StudiumBearbeitenUseCase = StudiumBearbeitenService(repository)
 
         service.modul_hinzufuegen(
             ModulHinzufuegenRequest(
@@ -37,11 +40,13 @@ class InputPortsTest(unittest.TestCase):
             )
         )
         service.modul_bearbeiten(
-            kurs_id="OOP",
-            kursname="Objektorientierte Programmierung",
-            ects=5,
-            pruefungsform=Pruefungsform.PORTFOLIO,
-            note=2.3,
+            ModulBearbeitenRequest(
+                kurs_id="OOP",
+                kursname="Objektorientierte Programmierung",
+                ects=5,
+                pruefungsform=Pruefungsform.PORTFOLIO,
+                note=2.3,
+            )
         )
 
         modul = repository.studium.modul_finden("OOP")
@@ -51,7 +56,7 @@ class InputPortsTest(unittest.TestCase):
 
     def test_modul_kann_ueber_frontend_port_bearbeitet_werden(self) -> None:
         repository = InMemoryStudiumRepository(self._studium())
-        service: StudiumBearbeitenInputPort = StudiumBearbeitenService(repository)
+        service: StudiumBearbeitenUseCase = StudiumBearbeitenService(repository)
 
         service.modul_hinzufuegen(
             ModulHinzufuegenRequest(
@@ -63,11 +68,13 @@ class InputPortsTest(unittest.TestCase):
         )
 
         service.modul_bearbeiten(
-            kurs_id="OOP",
-            kursname="Objektorientierte Programmierung und Design",
-            ects=10,
-            pruefungsform=Pruefungsform.PROJEKT,
-            note=1.7,
+            ModulBearbeitenRequest(
+                kurs_id="OOP",
+                kursname="Objektorientierte Programmierung und Design",
+                ects=10,
+                pruefungsform=Pruefungsform.PROJEKT,
+                note=1.7,
+            )
         )
 
         modul = repository.studium.modul_finden("OOP")
@@ -80,7 +87,7 @@ class InputPortsTest(unittest.TestCase):
     def test_analyse_service_implementiert_frontend_port(self) -> None:
         repository = InMemoryStudiumRepository(self._studium())
         bearbeiten_service = StudiumBearbeitenService(repository)
-        analyse_service: StudienAnalyseInputPort = StudienAnalyseService(repository)
+        analyse_service: StudienAnalyseUseCase = StudienAnalyseService(repository)
 
         bearbeiten_service.modul_hinzufuegen(
             ModulHinzufuegenRequest(
@@ -102,7 +109,7 @@ class InputPortsTest(unittest.TestCase):
     def test_analyse_service_liefert_pruefungsversuche_fuer_frontend(self) -> None:
         repository = InMemoryStudiumRepository(self._studium())
         bearbeiten_service = StudiumBearbeitenService(repository)
-        analyse_service: StudienAnalyseInputPort = StudienAnalyseService(repository)
+        analyse_service: StudienAnalyseUseCase = StudienAnalyseService(repository)
 
         bearbeiten_service.modul_hinzufuegen(
             ModulHinzufuegenRequest(
@@ -113,11 +120,13 @@ class InputPortsTest(unittest.TestCase):
             )
         )
         bearbeiten_service.modul_bearbeiten(
-            kurs_id="OOP",
-            kursname="Objektorientierte Programmierung",
-            ects=5,
-            pruefungsform=Pruefungsform.PORTFOLIO,
-            note=5.0,
+            ModulBearbeitenRequest(
+                kurs_id="OOP",
+                kursname="Objektorientierte Programmierung",
+                ects=5,
+                pruefungsform=Pruefungsform.PORTFOLIO,
+                note=5.0,
+            )
         )
 
         dashboard_daten = analyse_service.dashboard_daten_abrufen(
@@ -132,8 +141,8 @@ class InputPortsTest(unittest.TestCase):
 
     def test_anerkanntes_modul_kann_ohne_pruefungsform_angelegt_werden(self) -> None:
         repository = InMemoryStudiumRepository(self._studium())
-        bearbeiten_service: StudiumBearbeitenInputPort = StudiumBearbeitenService(repository)
-        analyse_service: StudienAnalyseInputPort = StudienAnalyseService(repository)
+        bearbeiten_service: StudiumBearbeitenUseCase = StudiumBearbeitenService(repository)
+        analyse_service: StudienAnalyseUseCase = StudienAnalyseService(repository)
 
         bearbeiten_service.modul_hinzufuegen(
             ModulHinzufuegenRequest(

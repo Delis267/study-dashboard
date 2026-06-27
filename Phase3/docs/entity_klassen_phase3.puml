@@ -1,0 +1,110 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+title Entity-Klassen Studien-Dashboard - Phase 3
+
+class Studium {
+  - studiengang: str
+  - startdatum: date
+  - zieldatum: date
+  - gesamt_ects: int
+  - ziel_notendurchschnitt: float
+  - module: list[Modul]
+  --
+  + modul_hinzufuegen(modul: Modul): None
+  + modul_finden(kurs_id: str): Modul | None
+  + modul_entfernen(kurs_id: str): None
+  + ects_fuer_status(...status_filter: ModulStatus): int
+  + erreichte_ects: int <<property>>
+  + eigenleistung_ects: int <<property>>
+  + offene_ects: int <<property>>
+  + fortschritt_prozent: float <<property>>
+  + gewichteter_notendurchschnitt: float | None <<property>>
+  + ziel_notendurchschnitt_erreicht: bool | None <<property>>
+  + ziel_velocity: float <<property>>
+  + velocity(stichtag: date): float
+  + prognostiziertes_ende(stichtag: date): date | None
+}
+
+class Modul {
+  - kurs_id: str
+  - kursname: str
+  - ects: int
+  - pruefungsleistung: Pruefungsleistung | None
+  --
+  + regulaer(kurs_id: str, kursname: str, ects: int, pruefungsform: Pruefungsform): Modul <<factory>>
+  + anerkannt(kurs_id: str, kursname: str, ects: int): Modul <<factory>>
+  + ist_anerkannt: bool <<property>>
+  + status: ModulStatus <<property>>
+  + aktuelle_note: float | None <<property>>
+  + note_eintragen(note: float): None
+  + pruefungsform_aendern(pruefungsform: Pruefungsform): None
+  + basisdaten_aendern(kursname: str | None, ects: int | None): None
+  + anerkennen(): None
+}
+
+class Pruefungsleistung {
+  - pruefungsform: Pruefungsform
+  - _versuche: list[Pruefungsversuch]
+  --
+  + versuch_eintragen(note: float): None
+  + pruefungsform_aendern(pruefungsform: Pruefungsform): None
+  + versuche: tuple[Pruefungsversuch, ...] <<property>>
+  + versuche_anzahl: int <<property>>
+  + letzter_versuch: Pruefungsversuch | None <<property>>
+  + ist_bestanden: bool <<property>>
+  + ist_endgueltig_nicht_bestanden: bool <<property>>
+}
+
+class Pruefungsversuch {
+  - note: float
+  --
+  + ist_bestanden: bool <<property>>
+}
+
+enum Pruefungsform {
+  KLAUSUR
+  ADVANCED_WORKBOOK
+  HAUSARBEIT
+  PORTFOLIO
+  PROJEKT
+  SEMINAR
+  PRAESENTATION
+  BACHELORARBEIT
+}
+
+enum ModulStatus {
+  OFFEN
+  IN_ARBEIT
+  FERTIG
+  ANERKANNT
+}
+
+Studium "1" *-- "0..*" Modul : enthaelt
+Modul "1" *-- "0..1" Pruefungsleistung : besitzt optional
+Pruefungsleistung "1" *-- "0..3" Pruefungsversuch : verwaltet
+
+Pruefungsleistung --> Pruefungsform : verwendet
+Modul --> ModulStatus : leitet ab
+
+note right of Modul
+  Anerkannte Module besitzen keine Pruefungsleistung.
+  Regulaere Module besitzen genau eine Pruefungsleistung.
+  Der ModulStatus wird aus der Pruefungsleistung
+  und den Pruefungsversuchen abgeleitet.
+end note
+
+note top of Pruefungsleistung
+  Die Pruefungsleistung kapselt die pruefungsbezogene Logik:
+  Sie verwaltet die Pruefungsform und die Pruefungsversuche,
+  begrenzt die Anzahl der Versuche auf maximal drei
+  und entscheidet, ob die Pruefung bestanden wurde.
+end note
+
+note left of Pruefungsversuch
+  Der Pruefungsversuch speichert keine Versuchsnummer.
+  Die Anzahl und Reihenfolge ergeben sich aus der Liste
+  in Pruefungsleistung.
+end note
+
+@enduml
