@@ -49,24 +49,19 @@ class StudiumBearbeitenService(StudiumBearbeitenInputPort):
         kurs_id: str,
         kursname: str,
         ects: int,
-        pruefungsform: Pruefungsform,
+        pruefungsform: Pruefungsform | None,
         note: float | None,
     ) -> None:
         studium = self.repository.laden()
         modul = self._modul_oder_fehler(studium, kurs_id)
 
-        if modul.status == ModulStatus.ANERKANNT:
-            if note is not None:
-                raise ValueError("Fuer anerkannte Module kann keine Note eingetragen werden.")
-            modul.daten_aendern(kursname=kursname, ects=ects)
-        else:
-            modul.daten_aendern(
-                kursname=kursname,
-                ects=ects,
-                pruefungsleistung=Pruefungsleistung(pruefungsform),
-            )
-            if note is not None:
-                modul.note_eintragen(note)
+        modul.basisdaten_aendern(kursname=kursname, ects=ects)
+
+        if note is not None:
+            modul.note_eintragen(note)
+
+        if pruefungsform is not None:
+            modul.pruefungsform_aendern(pruefungsform)
 
         self.repository.speichern(studium)
 

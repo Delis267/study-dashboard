@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-
 from .modul_status import ModulStatus
+from .pruefungsform import Pruefungsform
 from .pruefungsleistung import Pruefungsleistung
 
 
@@ -11,6 +11,10 @@ class Modul:
     ects: int
     pruefungsleistung: Pruefungsleistung | None
     status: ModulStatus = ModulStatus.OFFEN
+
+    @property
+    def ist_anerkannt(self) -> bool:
+        return self.status == ModulStatus.ANERKANNT
 
     def __post_init__(self) -> None:
         if not self.kurs_id.strip():
@@ -25,24 +29,23 @@ class Modul:
             raise ValueError("Nicht anerkannte Module brauchen eine Pruefungsleistung.")
 
     def note_eintragen(self, note: float) -> None:
-        if self.pruefungsleistung is None:
+        if self.ist_anerkannt:
             raise ValueError("Fuer anerkannte Module kann keine Note eingetragen werden.")
 
         self.pruefungsleistung.versuch_eintragen(note)
         self._status_aktualisieren()
 
-    def anerkennen(self) -> None:
-        if self.pruefungsleistung is not None and self.pruefungsleistung.versuche:
-            raise ValueError("Module mit Pruefungsversuchen koennen nicht anerkannt werden.")
+    def pruefungsform_aendern(self, pruefungsform: Pruefungsform) -> None:
+        if self.ist_anerkannt:
+            raise ValueError("Fuer anerkannte Module kann die Pruefungsform nicht geaendert werden.")
 
-        self.pruefungsleistung = None
-        self.status = ModulStatus.ANERKANNT
+        self.pruefungsleistung.pruefungsform_aendern(pruefungsform)
+        self._status_aktualisieren()
 
-    def daten_aendern(
+    def basisdaten_aendern(
         self,
         kursname: str | None = None,
-        ects: int | None = None,
-        pruefungsleistung: Pruefungsleistung | None = None,
+        ects: int | None = None
     ) -> None:
         if kursname is not None:
             if not kursname.strip():
@@ -54,12 +57,13 @@ class Modul:
                 raise ValueError("ECTS muessen groesser als 0 sein.")
             self.ects = ects
 
-        if pruefungsleistung is not None:
-            if self.status == ModulStatus.ANERKANNT:
-                raise ValueError("Anerkannte Module haben keine Pruefungsleistung.")
-            self.pruefungsleistung = pruefungsleistung
-            self._status_aktualisieren()
+    def anerkennen(self) -> None:
+        if self.pruefungsleistung is not None and self.pruefungsleistung.versuche:
+            raise ValueError("Module mit Pruefungsversuchen koennen nicht anerkannt werden.")
 
+        self.pruefungsleistung = None
+        self.status = ModulStatus.ANERKANNT
+            
     @property
     def aktuelle_note(self) -> float | None:
         if self.pruefungsleistung is None or self.pruefungsleistung.letzter_versuch is None:
@@ -86,4 +90,3 @@ class Modul:
             f"ects={self.ects}, status={self.status}, "
             f"pruefungsleistung={self.pruefungsleistung})"
         )
-
