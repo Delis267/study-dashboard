@@ -18,6 +18,9 @@ class Pruefungsleistung:
 
         self._versuche.append(Pruefungsversuch(note=note))
 
+    def pruefungsform_aendern(self, pruefungsform: Pruefungsform) -> None:
+        self.pruefungsform = pruefungsform
+        
     @property
     def versuche(self) -> tuple[Pruefungsversuch, ...]:
         return tuple(self._versuche)
