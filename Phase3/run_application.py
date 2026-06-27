@@ -15,7 +15,6 @@ def main() -> None:
     ergebnis = subprocess.run(
         [sys.executable, "-m", "bootstrap.main"],
         cwd=ROOT,
-        check=True,
         text=True,
         capture_output=True,
         env=umgebung,
@@ -25,6 +24,8 @@ def main() -> None:
     if ergebnis.stderr:
         print(ergebnis.stderr, end="")
     print()
+    if ergebnis.returncode != 0:
+        raise SystemExit(ergebnis.returncode)
 
 
 if __name__ == "__main__":

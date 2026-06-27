@@ -92,6 +92,35 @@ class InputPortsTest(unittest.TestCase):
         self.assertEqual(1, len(dashboard_daten.module))
         self.assertEqual("Portfolio", dashboard_daten.module[0].pruefungsform)
 
+    def test_analyse_service_liefert_pruefungsversuche_fuer_frontend(self) -> None:
+        repository = InMemoryStudiumRepository(self._studium())
+        bearbeiten_service = StudiumBearbeitenService(repository)
+        analyse_service: StudienAnalyseInputPort = StudienAnalyseService(repository)
+
+        bearbeiten_service.modul_hinzufuegen(
+            kurs_id="OOP",
+            kursname="Objektorientierte Programmierung",
+            ects=5,
+            pruefungsform=Pruefungsform.PORTFOLIO,
+        )
+        bearbeiten_service.modul_bearbeiten(
+            kurs_id="OOP",
+            kursname="Objektorientierte Programmierung",
+            ects=5,
+            pruefungsform=Pruefungsform.PORTFOLIO,
+            note=5.0,
+        )
+
+        dashboard_daten = analyse_service.dashboard_daten_abrufen(
+            stichtag=date(2025, 7, 1)
+        )
+        modul_daten = dashboard_daten.module[0]
+
+        self.assertIsNone(modul_daten.note)
+        self.assertEqual(1, len(modul_daten.versuche))
+        self.assertEqual(5.0, modul_daten.versuche[-1].note)
+        self.assertFalse(modul_daten.versuche[-1].ist_bestanden)
+
     def test_anerkanntes_modul_kann_ohne_pruefungsform_angelegt_werden(self) -> None:
         repository = InMemoryStudiumRepository(self._studium())
         bearbeiten_service: StudiumBearbeitenInputPort = StudiumBearbeitenService(repository)
