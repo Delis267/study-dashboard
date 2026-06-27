@@ -41,24 +41,19 @@ class Studium:
             raise ValueError("Modul nicht gefunden.")
         self.module.remove(modul)
 
-    @property
-    def ects_nach_status(self) -> dict[ModulStatus, int]:
-        verteilung = {status: 0 for status in ModulStatus}
-        for modul in self.module:
-            verteilung[modul.status] += modul.ects
-        return verteilung
+    def ects_fuer_status(self, *status_filter: ModulStatus) -> int:
+        ''' Gibt die Summe der ECTS-Punkte für die angegebenen Modulstatus zurück.'''
+        if not status_filter:
+            raise ValueError("Es muss mindestens ein Modulstatus angegeben werden.")
+        return sum(modul.ects for modul in self.module if modul.status in status_filter)
 
     @property
     def erreichte_ects(self) -> int:
-        return sum(
-            modul.ects
-            for modul in self.module
-            if modul.status in (ModulStatus.FERTIG, ModulStatus.ANERKANNT)
-        )
+        return self.ects_fuer_status(ModulStatus.FERTIG, ModulStatus.ANERKANNT)
 
     @property
     def eigenleistung_ects(self) -> int:
-        return sum(modul.ects for modul in self.module if modul.status == ModulStatus.FERTIG)
+        return self.ects_fuer_status(ModulStatus.FERTIG)
 
     @property
     def offene_ects(self) -> int:
@@ -117,14 +112,3 @@ class Studium:
 
         tage = (stichtag - self.startdatum).days
         return round(tage / 30.4375, 2)
-
-    def status_ausgeben(self) -> None:
-        print("Studiengang:", self.studiengang)
-        print("Zeitraum:", self.startdatum, "bis", self.zieldatum)
-        print("Erreichte ECTS:", self.erreichte_ects, "von", self.gesamt_ects)
-        print("Fortschritt in Prozent:", self.fortschritt_prozent)
-        print("Notendurchschnitt:", self.gewichteter_notendurchschnitt)
-        print("Module:")
-        for modul in self.module:
-            print("-", modul)
-        print()
