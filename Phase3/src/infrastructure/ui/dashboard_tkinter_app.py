@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 
 from application.dtos.dashboard_daten_response import DashboardDatenResponse, ModulDaten
-from application.dtos.studium_bearbeiten_requests import ModulHinzufuegenRequest
+from application.dtos.studium_bearbeiten_requests import ModulBearbeitenRequest, ModulHinzufuegenRequest
 from application.ports.studien_analyse_use_case import StudienAnalyseUseCase
 from application.ports.studium_bearbeiten_use_case import StudiumBearbeitenUseCase
 from domain.modul_status import ModulStatus
@@ -230,7 +230,6 @@ class DashboardTkinterApp:
         modul = dialog.anzeigen()
         if modul is None:
             return
-
         try:
             self.bearbeiten_port.modul_hinzufuegen(
                 ModulHinzufuegenRequest(
@@ -241,14 +240,6 @@ class DashboardTkinterApp:
                     ist_anerkannt=modul["ist_anerkannt"],
                 )
             )
-            if modul["note"] is not None:
-                self.bearbeiten_port.modul_bearbeiten(
-                    kurs_id=modul["kurs_id"],
-                    kursname=modul["kursname"],
-                    ects=modul["ects"],
-                    pruefungsform=modul["pruefungsform"],
-                    note=modul["note"],
-                )
             self.aktualisieren()
         except ValueError as fehler:
             messagebox.showerror("Modul nicht angelegt", str(fehler))
@@ -274,11 +265,13 @@ class DashboardTkinterApp:
                 self.modul_loeschen(modul)
                 return
             self.bearbeiten_port.modul_bearbeiten(
-                kurs_id=modul.kurs_id,
-                kursname=aktion["kursname"],
-                ects=aktion["ects"],
-                pruefungsform=aktion["pruefungsform"],
-                note=aktion["note"],
+                ModulBearbeitenRequest(
+                    kurs_id=modul.kurs_id,
+                    kursname=aktion["kursname"],
+                    ects=aktion["ects"],
+                    pruefungsform=aktion["pruefungsform"],
+                    note=aktion["note"],
+                )
             )
             self.aktualisieren()
         except ValueError as fehler:

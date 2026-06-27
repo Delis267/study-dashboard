@@ -45,7 +45,7 @@ class Modul:
     def basisdaten_aendern(
         self,
         kursname: str | None = None,
-        ects: int | None = None
+        ects: int | None = None,
     ) -> None:
         if kursname is not None:
             if not kursname.strip():

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from application.dtos.studium_bearbeiten_requests import ModulHinzufuegenRequest
+from application.dtos.studium_bearbeiten_requests import ModulBearbeitenRequest, ModulHinzufuegenRequest
 from domain.pruefungsform import Pruefungsform
 
 
@@ -14,12 +14,6 @@ class StudiumBearbeitenUseCase(ABC):
         pass
 
     @abstractmethod
-    def modul_bearbeiten(
-        self,
-        kurs_id: str,
-        kursname: str,
-        ects: int,
-        pruefungsform: Pruefungsform | None,
-        note: float | None,
-    ) -> None:
+    def modul_bearbeiten(self, request: ModulBearbeitenRequest) -> None:
         pass
+
