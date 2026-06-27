@@ -1,8 +1,13 @@
 from datetime import date
 
-from application.dtos.dashboard_daten import DashboardDaten, ModulDaten
+from application.dtos.dashboard_daten import (
+    DashboardDaten,
+    ModulDaten,
+    PruefungsversuchDaten,
+)
 from application.ports.studien_analyse_input_port import StudienAnalyseInputPort
 from application.ports.studium_repository_port import StudiumRepositoryPort
+from domain.modul import Modul
 
 
 class StudienAnalyseService(StudienAnalyseInputPort):
@@ -32,19 +37,30 @@ class StudienAnalyseService(StudienAnalyseInputPort):
             velocity_ects_pro_monat=studium.velocity(stichtag),
             ziel_velocity_ects_pro_monat=studium.ziel_velocity,
             prognostiziertes_ende=studium.prognostiziertes_ende(stichtag),
-            module=[
-                ModulDaten(
-                    kurs_id=modul.kurs_id,
-                    kursname=modul.kursname,
-                    ects=modul.ects,
-                    status=modul.status,
-                    pruefungsform=(
-                        None
-                        if modul.pruefungsleistung is None
-                        else modul.pruefungsleistung.pruefungsform.value
-                    ),
-                    note=modul.aktuelle_note,
+            module=[self._modul_daten_erstellen(modul) for modul in studium.module],
+        )
+
+    def _modul_daten_erstellen(self, modul: Modul) -> ModulDaten:
+        pruefungsleistung = modul.pruefungsleistung
+        pruefungsform = None
+        versuche = ()
+
+        if pruefungsleistung is not None:
+            pruefungsform = pruefungsleistung.pruefungsform.value
+            versuche = tuple(
+                PruefungsversuchDaten(
+                    note=versuch.note,
+                    ist_bestanden=versuch.ist_bestanden,
                 )
-                for modul in studium.module
-            ],
+                for versuch in pruefungsleistung.versuche
+            )
+
+        return ModulDaten(
+            kurs_id=modul.kurs_id,
+            kursname=modul.kursname,
+            ects=modul.ects,
+            status=modul.status,
+            pruefungsform=pruefungsform,
+            note=modul.aktuelle_note,
+            versuche=versuche,
         )

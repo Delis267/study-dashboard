@@ -54,4 +54,3 @@ class Pruefungsleistung:
             f"versuche={self.versuche_anzahl}, "
             f"letzter_versuch={self.letzter_versuch})"
         )
-
