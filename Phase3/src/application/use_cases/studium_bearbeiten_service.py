@@ -12,7 +12,8 @@ class StudiumBearbeitenService(StudiumBearbeitenUseCase):
 
     def modul_hinzufuegen(self, request: ModulHinzufuegenRequest) -> None:
         studium = self.repository.laden()
-        studium.modul_hinzufuegen(request.to_modul())
+        modul = self._modul_aus_request_erstellen(request)
+        studium.modul_hinzufuegen(modul)
         self.repository.speichern(studium)
 
     def modul_loeschen(self, kurs_id: str) -> None:
@@ -38,4 +39,25 @@ class StudiumBearbeitenService(StudiumBearbeitenUseCase):
         modul = studium.modul_finden(kurs_id)
         if modul is None:
             raise ValueError("Modul nicht gefunden.")
+        return modul
+
+    def _modul_aus_request_erstellen(self, request: ModulHinzufuegenRequest) -> Modul:
+        if request.ist_anerkannt:
+            return Modul.anerkannt(
+                request.kurs_id,
+                request.kursname,
+                request.ects,
+            )
+
+        if request.pruefungsform is None:
+            raise ValueError("Nicht anerkannte Module brauchen eine Pruefungsform.")
+
+        modul = Modul.regulaer(
+            request.kurs_id,
+            request.kursname,
+            request.ects,
+            request.pruefungsform,
+        )
+        if request.note is not None:
+            modul.note_eintragen(request.note)
         return modul

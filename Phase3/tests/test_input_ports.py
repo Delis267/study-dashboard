@@ -84,6 +84,23 @@ class InputPortsTest(unittest.TestCase):
         self.assertEqual(Pruefungsform.PROJEKT, modul.pruefungsleistung.pruefungsform)
         self.assertEqual(1.7, modul.aktuelle_note)
 
+    def test_modul_kann_beim_hinzufuegen_mit_note_angelegt_werden(self) -> None:
+        repository = InMemoryStudiumRepository(self._studium())
+        service: StudiumBearbeitenUseCase = StudiumBearbeitenService(repository)
+
+        service.modul_hinzufuegen(
+            ModulHinzufuegenRequest(
+                kurs_id="OOP",
+                kursname="Objektorientierte Programmierung",
+                ects=5,
+                pruefungsform=Pruefungsform.PORTFOLIO,
+                note=2.3,
+            )
+        )
+
+        modul = repository.studium.modul_finden("OOP")
+        self.assertEqual(2.3, modul.aktuelle_note)
+
     def test_analyse_service_implementiert_frontend_port(self) -> None:
         repository = InMemoryStudiumRepository(self._studium())
         bearbeiten_service = StudiumBearbeitenService(repository)
