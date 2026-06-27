@@ -1,6 +1,7 @@
 import unittest
 from datetime import date
 
+from application.dtos.studium_bearbeiten_requests import ModulHinzufuegenRequest
 from application.ports.studien_analyse_input_port import StudienAnalyseInputPort
 from application.ports.studium_bearbeiten_input_port import StudiumBearbeitenInputPort
 from application.use_cases.studien_analyse_service import StudienAnalyseService
@@ -28,10 +29,12 @@ class InputPortsTest(unittest.TestCase):
         service: StudiumBearbeitenInputPort = StudiumBearbeitenService(repository)
 
         service.modul_hinzufuegen(
-            kurs_id="OOP",
-            kursname="Objektorientierte Programmierung",
-            ects=5,
-            pruefungsform=Pruefungsform.PORTFOLIO,
+            ModulHinzufuegenRequest(
+                kurs_id="OOP",
+                kursname="Objektorientierte Programmierung",
+                ects=5,
+                pruefungsform=Pruefungsform.PORTFOLIO,
+            )
         )
         service.modul_bearbeiten(
             kurs_id="OOP",
@@ -51,10 +54,12 @@ class InputPortsTest(unittest.TestCase):
         service: StudiumBearbeitenInputPort = StudiumBearbeitenService(repository)
 
         service.modul_hinzufuegen(
-            kurs_id="OOP",
-            kursname="Objektorientierte Programmierung",
-            ects=5,
-            pruefungsform=Pruefungsform.PORTFOLIO,
+            ModulHinzufuegenRequest(
+                kurs_id="OOP",
+                kursname="Objektorientierte Programmierung",
+                ects=5,
+                pruefungsform=Pruefungsform.PORTFOLIO,
+            )
         )
 
         service.modul_bearbeiten(
@@ -78,10 +83,12 @@ class InputPortsTest(unittest.TestCase):
         analyse_service: StudienAnalyseInputPort = StudienAnalyseService(repository)
 
         bearbeiten_service.modul_hinzufuegen(
-            kurs_id="OOP",
-            kursname="Objektorientierte Programmierung",
-            ects=5,
-            pruefungsform=Pruefungsform.PORTFOLIO,
+            ModulHinzufuegenRequest(
+                kurs_id="OOP",
+                kursname="Objektorientierte Programmierung",
+                ects=5,
+                pruefungsform=Pruefungsform.PORTFOLIO,
+            )
         )
 
         dashboard_daten = analyse_service.dashboard_daten_abrufen(
@@ -98,10 +105,12 @@ class InputPortsTest(unittest.TestCase):
         analyse_service: StudienAnalyseInputPort = StudienAnalyseService(repository)
 
         bearbeiten_service.modul_hinzufuegen(
-            kurs_id="OOP",
-            kursname="Objektorientierte Programmierung",
-            ects=5,
-            pruefungsform=Pruefungsform.PORTFOLIO,
+            ModulHinzufuegenRequest(
+                kurs_id="OOP",
+                kursname="Objektorientierte Programmierung",
+                ects=5,
+                pruefungsform=Pruefungsform.PORTFOLIO,
+            )
         )
         bearbeiten_service.modul_bearbeiten(
             kurs_id="OOP",
@@ -127,10 +136,13 @@ class InputPortsTest(unittest.TestCase):
         analyse_service: StudienAnalyseInputPort = StudienAnalyseService(repository)
 
         bearbeiten_service.modul_hinzufuegen(
-            kurs_id="MATHE",
-            kursname="Mathematik Grundlagen",
-            ects=5,
-            pruefungsform=None,
+            ModulHinzufuegenRequest(
+                kurs_id="MATHE",
+                kursname="Mathematik Grundlagen",
+                ects=5,
+                pruefungsform=None,
+                ist_anerkannt=True,
+            )
         )
 
         dashboard_daten = analyse_service.dashboard_daten_abrufen(

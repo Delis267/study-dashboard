@@ -101,12 +101,17 @@ class DomainTest(unittest.TestCase):
         self.assertEqual(5, studium.offene_ects)
         self.assertEqual(2.5, studium.gewichteter_notendurchschnitt)
         self.assertTrue(studium.ziel_notendurchschnitt_erreicht)
-        self.assertEqual(5, studium.ects_nach_status[ModulStatus.ANERKANNT])
-        self.assertEqual(10, studium.ects_nach_status[ModulStatus.FERTIG])
+        self.assertEqual(5, studium.ects_fuer_status(ModulStatus.ANERKANNT))
+        self.assertEqual(10, studium.ects_fuer_status(ModulStatus.FERTIG))
+        self.assertEqual(
+            15,
+            studium.ects_fuer_status(ModulStatus.FERTIG, ModulStatus.ANERKANNT),
+        )
+        with self.assertRaises(ValueError):
+            studium.ects_fuer_status()
         self.assertGreater(studium.velocity(date(2025, 7, 1)), 0)
         self.assertIsNotNone(studium.prognostiziertes_ende(date(2025, 7, 1)))
 
 
 if __name__ == "__main__":
     unittest.main()
-
