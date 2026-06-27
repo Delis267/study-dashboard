@@ -203,9 +203,9 @@ class DashboardTkinterApp:
             "kurs_id": 100,
             "ects": 55,
             "kursname": 330,
-            "status": 110,
+            "status": 170,
             "pruefungsform": 130,
-            "note": 80,
+            "note": 150,
         }
 
         for spalte in spalten:
@@ -411,11 +411,23 @@ class DashboardTkinterApp:
                     modul.ects,
                     modul.kursname,
                     "-" if modul.pruefungsform is None else modul.pruefungsform,
-                    modul.status.value,
-                    "-" if modul.note is None else modul.note,
-                    "Doppelklick",
+                    self._status_anzeigen(modul),
+                    self._note_anzeigen(modul),
                 ),
             )
+
+    def _status_anzeigen(self, modul: ModulDaten) -> str:
+        if modul.status in (ModulStatus.IN_ARBEIT, ModulStatus.FERTIG):
+            return f"{modul.status.value} ({len(modul.versuche)}/3)"
+        return modul.status.value
+
+    def _note_anzeigen(self, modul: ModulDaten) -> str:
+        if modul.note is not None:
+            return str(modul.note)
+        if modul.versuche:
+            letzter_versuch = modul.versuche[-1]
+            return f"{letzter_versuch.note} (nicht bestanden)"
+        return "-"
 
     def _zieltext(self, ziel_erreicht: bool | None) -> str:
         if ziel_erreicht is None:
@@ -645,7 +657,7 @@ class ModulBearbeitenDialog:
         return ttk.Entry(parent, textvariable=variable, state="readonly")
 
     def _notenwerte(self) -> list[str]:
-        if self.modul.note is None:
+        if not self.modul.versuche or self.modul.note is None:
             return [""] + [str(note) for note in sorted(ERLAUBTE_NOTEN)]
         return [str(note) for note in sorted(ERLAUBTE_NOTEN)]
 

@@ -5,6 +5,12 @@ from domain.modul_status import ModulStatus
 
 
 @dataclass(frozen=True)
+class PruefungsversuchDaten:
+    note: float
+    ist_bestanden: bool
+
+
+@dataclass(frozen=True)
 class ModulDaten:
     kurs_id: str
     kursname: str
@@ -12,6 +18,7 @@ class ModulDaten:
     status: ModulStatus
     pruefungsform: str | None
     note: float | None
+    versuche: tuple[PruefungsversuchDaten, ...]
 
 
 @dataclass(frozen=True)
@@ -31,4 +38,3 @@ class DashboardDaten:
     ziel_velocity_ects_pro_monat: float
     prognostiziertes_ende: date | None
     module: list[ModulDaten]
-

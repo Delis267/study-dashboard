@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 from domain.pruefungsform import Pruefungsform
 
+
 class StudiumBearbeitenInputPort(ABC):
     @abstractmethod
     def modul_hinzufuegen(
@@ -9,8 +10,8 @@ class StudiumBearbeitenInputPort(ABC):
         kurs_id: str,
         kursname: str,
         ects: int,
-        pruefungsform: Pruefungsform,
-        ist_anerkannt: bool = False # Default False, optional bei Modulanlage
+        pruefungsform: Pruefungsform | None,
+        ist_anerkannt: bool = False,
     ) -> None:
         pass
 
@@ -20,12 +21,11 @@ class StudiumBearbeitenInputPort(ABC):
 
     @abstractmethod
     def modul_bearbeiten(
-            self, 
-            kurs_id: str,
-            kursname: str,
-            ects: int, 
-            pruefungsform: Pruefungsform, 
-            note: float | None) -> None:
-        '''Der Kursname, die ECTS-Punkte, die Prüfungsform und die Note eines Moduls werden bearbeitet.
-        Note ist der einzige optionale Parameter.'''
+        self,
+        kurs_id: str,
+        kursname: str,
+        ects: int,
+        pruefungsform: Pruefungsform | None,
+        note: float | None,
+    ) -> None:
         pass
