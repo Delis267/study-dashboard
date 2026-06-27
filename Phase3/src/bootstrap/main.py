@@ -8,33 +8,24 @@ from infrastructure.persistence.json_studium_repository import JsonStudiumReposi
 
 
 class Application:
-    def __init__(self) -> None:
-        datenpfad = Path(__file__).resolve().parents[2] / "data" / "studium.json"
+
+    def starten(self, filename: str) -> None:
+        datenpfad = Path(__file__).resolve().parents[2] / filename
 
         print("Starte Anwendung mit Datenpfad für das Json-Repository:", datenpfad)
+
         repository = JsonStudiumRepository(datenpfad)
-        self.bearbeiten_service = StudiumBearbeitenService(repository)
-        self.analyse_service = StudienAnalyseService(repository)
-
-    def demo_starten(self) -> None:
-        dashboard_daten = self.analyse_service.dashboard_daten_abrufen(
-            stichtag=date(2026, 6, 27),
-        )
-
-        print("Studiengang:", dashboard_daten.studiengang)
-        print("Erreichte ECTS:", dashboard_daten.erreichte_ects)
-        print("Offene ECTS:", dashboard_daten.offene_ects)
-        print("Notendurchschnitt:", dashboard_daten.notendurchschnitt)
-        print("Velocity:", dashboard_daten.velocity_ects_pro_monat)
-        print("Prognose:", dashboard_daten.prognostiziertes_ende)
-
-    def starten(self) -> None:
+        bearbeiten_service = StudiumBearbeitenService(repository)
+        analyse_service = StudienAnalyseService(repository)
+        
         app = DashboardTkinterApp(
-            analyse_port=self.analyse_service,
-            bearbeiten_port=self.bearbeiten_service,
+            analyse_port=analyse_service,
+            bearbeiten_port=bearbeiten_service,
         )
+
         app.starten()
 
 
 if __name__ == "__main__":
-    Application().starten()
+    Application()\
+        .starten("data/studium.json")

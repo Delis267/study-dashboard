@@ -41,6 +41,8 @@ class DashboardTkinterApp:
         self.fenster.title("Studien-Dashboard")
         self.fenster.geometry("1120x720")
         self._module: dict[str, ModulDaten] = {}
+        self._sortierspalte: str | None = None
+        self._sortierung_absteigend = False
 
         self._oberflaeche_erstellen()
         self.aktualisieren()
@@ -192,7 +194,7 @@ class DashboardTkinterApp:
         )
         self.tabelle = ttk.Treeview(parent, columns=spalten, show="headings", height=18)
 
-        ueberschriften = {
+        self._tabellen_ueberschriften = {
             "kurs_id": "Kurs-ID",
             "ects": "ECTS",
             "kursname": "Kursname",
@@ -210,7 +212,11 @@ class DashboardTkinterApp:
         }
 
         for spalte in spalten:
-            self.tabelle.heading(spalte, text=ueberschriften[spalte])
+            self.tabelle.heading(
+                spalte,
+                text=self._tabellen_ueberschriften[spalte],
+                command=lambda sortierspalte=spalte: self._tabelle_sortieren(sortierspalte),
+            )
             self.tabelle.column(spalte, width=breiten[spalte], anchor="w")
 
         scrollbar = ttk.Scrollbar(parent, orient="vertical", command=self.tabelle.yview)
@@ -393,11 +399,12 @@ class DashboardTkinterApp:
             )
 
     def _tabelle_aktualisieren(self, module: list[ModulDaten]) -> None:
-        self._module = {modul.kurs_id: modul for modul in module}
+        sortierte_module = self._sortierte_module(module)
+        self._module = {modul.kurs_id: modul for modul in sortierte_module}
         for eintrag in self.tabelle.get_children():
             self.tabelle.delete(eintrag)
 
-        for modul in module:
+        for modul in sortierte_module:
             self.tabelle.insert(
                 "",
                 "end",
@@ -410,6 +417,57 @@ class DashboardTkinterApp:
                     self._status_anzeigen(modul),
                     self._note_anzeigen(modul),
                 ),
+            )
+        self._tabellenkopf_aktualisieren()
+
+    def _tabelle_sortieren(self, spalte: str) -> None:
+        if self._sortierspalte == spalte:
+            self._sortierung_absteigend = not self._sortierung_absteigend
+        else:
+            self._sortierspalte = spalte
+            self._sortierung_absteigend = False
+
+        module = list(self._module.values())
+        self._tabelle_aktualisieren(module)
+
+    def _sortierte_module(self, module: list[ModulDaten]) -> list[ModulDaten]:
+        if self._sortierspalte is None:
+            return module
+
+        return sorted(
+            module,
+            key=lambda modul: self._sortierwert(modul, self._sortierspalte),
+            reverse=self._sortierung_absteigend,
+        )
+
+    def _sortierwert(self, modul: ModulDaten, spalte: str) -> object:
+        if spalte == "kurs_id":
+            return modul.kurs_id.lower()
+        if spalte == "ects":
+            return modul.ects
+        if spalte == "kursname":
+            return modul.kursname.lower()
+        if spalte == "pruefungsform":
+            return "" if modul.pruefungsform is None else modul.pruefungsform.lower()
+        if spalte == "status":
+            return modul.status.value.lower()
+        if spalte == "note":
+            if modul.note is not None:
+                return modul.note
+            if modul.versuche:
+                return modul.versuche[-1].note
+            return float("inf")
+        return ""
+
+    def _tabellenkopf_aktualisieren(self) -> None:
+        for spalte, text in self._tabellen_ueberschriften.items():
+            if spalte == self._sortierspalte:
+                richtung = " v" if self._sortierung_absteigend else " ^"
+                text = f"{text}{richtung}"
+            self.tabelle.heading(
+                spalte,
+                text=text,
+                command=lambda sortierspalte=spalte: self._tabelle_sortieren(sortierspalte),
             )
 
     def _status_anzeigen(self, modul: ModulDaten) -> str:

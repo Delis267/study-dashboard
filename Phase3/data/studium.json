@@ -367,7 +367,7 @@
             "kurs_id": "WAHL2",
             "kursname": "OOP-Projekt mit Python",
             "ects": 5,
-            "status": "IN_ARBEIT",
+            "status": "OFFEN",
             "pruefungsleistung": {
                 "pruefungsform": "PORTFOLIO",
                 "versuche": []
