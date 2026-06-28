@@ -89,12 +89,6 @@ class Modul:
                 raise ValueError("ECTS muessen groesser als 0 sein.")
             self.ects = ects
 
-    def anerkennen(self) -> None:
-        if self.pruefungsleistung is not None and self.pruefungsleistung.versuche:
-            raise ValueError("Module mit Pruefungsversuchen koennen nicht anerkannt werden.")
-
-        self.pruefungsleistung = None
-            
     @property
     def aktuelle_note(self) -> float | None:
         if self.pruefungsleistung is None or self.pruefungsleistung.letzter_versuch is None:
@@ -102,10 +96,3 @@ class Modul:
         if not self.pruefungsleistung.ist_bestanden:
             return None
         return self.pruefungsleistung.letzter_versuch.note
-
-    def __str__(self) -> str:
-        return (
-            f"Modul(id={self.kurs_id}, name={self.kursname}, "
-            f"ects={self.ects}, status={self.status}, "
-            f"pruefungsleistung={self.pruefungsleistung})"
-        )

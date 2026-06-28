@@ -6,7 +6,3 @@ class ModulStatus(Enum):
     IN_ARBEIT = "In Arbeit"
     FERTIG = "Fertig"
     ANERKANNT = "Anerkannt"
-
-    def __str__(self) -> str:
-        return self.name
-

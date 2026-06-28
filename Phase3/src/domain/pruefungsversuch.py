@@ -27,10 +27,3 @@ class Pruefungsversuch:
     @property
     def ist_bestanden(self) -> bool:
         return self.note <= 4.0
-
-    def __str__(self) -> str:
-        return f"Pruefungsversuch(note={self.note}, bestanden={self.ist_bestanden})"
-
-    def __repr__(self) -> str:
-        return str(self)
-
