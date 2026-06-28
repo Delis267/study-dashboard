@@ -20,6 +20,13 @@ cd Phase3
 python run_application.py
 ```
 
+Alternative
+```powershell
+cd Phase3/src
+python -m bootstrap.main
+```
+
+
 Danach öffnet sich die Tkinter-Oberfläche des Studien-Dashboards. Die Anwendung lädt die Beispieldaten aus:
 
 ```text
@@ -40,7 +47,7 @@ python run_tests.py
 
 - Ein neues Modul wird über die Schaltfläche `Neues Modul hinzufügen` angelegt.
 - Ein vorhandenes Modul kann per Doppelklick in der Tabelle bearbeitet oder gelöscht werden.
-- Anerkannte Module können ohne Prüfungsform angelegt werden.
+- Die Modultabelle lässt sich mit Klick auf den Tabellenkopf sortieren.
 
 ## Hinweise zur Projektstruktur
 

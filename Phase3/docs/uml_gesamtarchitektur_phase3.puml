@@ -5,27 +5,39 @@ top to bottom direction
 title Gesamtarchitektur Studien-Dashboard - Phase 3
 
 package "Bootstrap" {
-  class Application
+  class Application {
+    + starten(filename: str): None
+  }
 }
 
 package "Eingehender Adapter" {
-  class DashboardTkinterApp
+  class DashboardTkinterApp {
+    + starten(): None
+    + aktualisieren(): None
+    + modul_hinzufuegen(): None
+    + modul_bearbeiten(...): None
+    + modul_loeschen(...): None
+  }
 }
 
 package "Ausgehender Adapter" {
-  class JsonStudiumRepository
+  class JsonStudiumRepository {
+    - dateiname: Path
+    + laden(): Studium
+    + speichern(studium: Studium): None
+  }
 }
 
 rectangle "Anwendungskern" {
   package "Input-Port" {
     interface StudienAnalyseUseCase {
-      + dashboard_daten_abrufen(stichtag: date | None): DashboardDatenResponse
+      + dashboard_daten_abrufen(stichtag: date | None)
     }
 
     interface StudiumBearbeitenUseCase {
-      + modul_hinzufuegen(request: ModulHinzufuegenRequest): None
+      + modul_hinzufuegen(...): None
       + modul_loeschen(kurs_id: str): None
-      + modul_bearbeiten(request: ModulBearbeitenRequest): None
+      + modul_bearbeiten(...): None
     }
   }
 
@@ -71,6 +83,8 @@ StudiumBearbeitenService ..|> StudiumBearbeitenUseCase : implementiert
 StudienAnalyseService --> StudiumRepositoryPort : verwendet
 StudiumBearbeitenService --> StudiumRepositoryPort : verwendet
 JsonStudiumRepository ..|> StudiumRepositoryPort : implementiert
+JsonStudiumRepository --> Studium : rekonstruiert/persistiert
+JsonStudiumRepository --> Modul : rekonstruiert/persistiert
 
 StudienAnalyseService --> Studium : liest
 StudiumBearbeitenService --> Studium : veraendert

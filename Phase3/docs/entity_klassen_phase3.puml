@@ -15,15 +15,12 @@ class Studium {
   + modul_finden(kurs_id: str): Modul | None
   + modul_entfernen(kurs_id: str): None
   + ects_fuer_status(...status_filter: ModulStatus): int
-  + erreichte_ects: int <<property>>
-  + eigenleistung_ects: int <<property>>
-  + offene_ects: int <<property>>
-  + fortschritt_prozent: float <<property>>
   + gewichteter_notendurchschnitt: float | None <<property>>
   + ziel_notendurchschnitt_erreicht: bool | None <<property>>
   + ziel_velocity: float <<property>>
   + velocity(stichtag: date): float
   + prognostiziertes_ende(stichtag: date): date | None
+  - _monate_seit_start(stichtag: date): float
 }
 
 class Modul {
@@ -40,7 +37,6 @@ class Modul {
   + note_eintragen(note: float): None
   + pruefungsform_aendern(pruefungsform: Pruefungsform): None
   + basisdaten_aendern(kursname: str | None, ects: int | None): None
-  + anerkennen(): None
 }
 
 class Pruefungsleistung {
@@ -61,6 +57,12 @@ class Pruefungsversuch {
   --
   + ist_bestanden: bool <<property>>
 }
+
+note top of Pruefungsversuch
+  @dataclass(frozen=True)
+  Ein Pruefungsversuch ist nach dem Anlegen unveraenderlich.
+  Die erlaubten Notenwerte werden beim Erzeugen validiert.
+end note
 
 enum Pruefungsform {
   KLAUSUR
@@ -105,6 +107,8 @@ note left of Pruefungsversuch
   Der Pruefungsversuch speichert keine Versuchsnummer.
   Die Anzahl und Reihenfolge ergeben sich aus der Liste
   in Pruefungsleistung.
+  Persistiert wird er als Objekt, z.B. {"note": 2.3},
+  nicht nur als reine Zahlenliste.
 end note
 
 @enduml

@@ -123,6 +123,46 @@ class InputPortsTest(unittest.TestCase):
         self.assertEqual(1, len(dashboard_daten.module))
         self.assertEqual("Portfolio", dashboard_daten.module[0].pruefungsform)
 
+    def test_analyse_service_berechnet_ects_kennzahlen(self) -> None:
+        repository = InMemoryStudiumRepository(self._studium(gesamt_ects=18))
+        bearbeiten_service = StudiumBearbeitenService(repository)
+        analyse_service: StudienAnalyseUseCase = StudienAnalyseService(repository)
+
+        bearbeiten_service.modul_hinzufuegen(
+            ModulHinzufuegenRequest(
+                kurs_id="OOP",
+                kursname="Objektorientierte Programmierung",
+                ects=10,
+                pruefungsform=Pruefungsform.PORTFOLIO,
+                note=2.3,
+            )
+        )
+        bearbeiten_service.modul_hinzufuegen(
+            ModulHinzufuegenRequest(
+                kurs_id="MATHE",
+                kursname="Mathematik Grundlagen",
+                ects=5,
+                pruefungsform=None,
+                ist_anerkannt=True,
+            )
+        )
+        bearbeiten_service.modul_hinzufuegen(
+            ModulHinzufuegenRequest(
+                kurs_id="DB",
+                kursname="Datenbanken",
+                ects=5,
+                pruefungsform=Pruefungsform.KLAUSUR,
+            )
+        )
+
+        dashboard_daten = analyse_service.dashboard_daten_abrufen(
+            stichtag=date(2025, 7, 1)
+        )
+
+        self.assertEqual(15, dashboard_daten.erreichte_ects)
+        self.assertEqual(3, dashboard_daten.offene_ects)
+        self.assertEqual(83.33, dashboard_daten.fortschritt_prozent)
+
     def test_analyse_service_liefert_pruefungsversuche_fuer_frontend(self) -> None:
         repository = InMemoryStudiumRepository(self._studium())
         bearbeiten_service = StudiumBearbeitenService(repository)
@@ -178,12 +218,12 @@ class InputPortsTest(unittest.TestCase):
         self.assertEqual(5, dashboard_daten.erreichte_ects)
         self.assertIsNone(dashboard_daten.module[0].pruefungsform)
 
-    def _studium(self) -> Studium:
+    def _studium(self, gesamt_ects: int = 180) -> Studium:
         return Studium(
             studiengang="Software Engineering",
             startdatum=date(2025, 1, 1),
             zieldatum=date(2028, 1, 1),
-            gesamt_ects=180,
+            gesamt_ects=gesamt_ects,
             ziel_notendurchschnitt=2.0,
         )
 

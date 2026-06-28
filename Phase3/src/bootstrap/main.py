@@ -28,4 +28,4 @@ class Application:
 
 if __name__ == "__main__":
     Application()\
-        .starten("data/studium.json")
+        .starten("src/data/studium.json")
