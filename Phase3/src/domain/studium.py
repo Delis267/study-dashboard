@@ -48,22 +48,6 @@ class Studium:
         return sum(modul.ects for modul in self.module if modul.status in status_filter)
 
     @property
-    def erreichte_ects(self) -> int:
-        return self.ects_fuer_status(ModulStatus.FERTIG, ModulStatus.ANERKANNT)
-
-    @property
-    def eigenleistung_ects(self) -> int:
-        return self.ects_fuer_status(ModulStatus.FERTIG)
-
-    @property
-    def offene_ects(self) -> int:
-        return max(self.gesamt_ects - self.erreichte_ects, 0)
-
-    @property
-    def fortschritt_prozent(self) -> float:
-        return round(self.erreichte_ects / self.gesamt_ects * 100, 2)
-
-    @property
     def gewichteter_notendurchschnitt(self) -> float | None:
         benotete_module = [
             modul
@@ -93,14 +77,19 @@ class Studium:
         monate = self._monate_seit_start(stichtag)
         if monate == 0:
             return 0.0
-        return round(self.eigenleistung_ects / monate, 2)
+        eigenleistung_ects = self.ects_fuer_status(ModulStatus.FERTIG)
+        return round(eigenleistung_ects / monate, 2)
 
     def prognostiziertes_ende(self, stichtag: date) -> date | None:
         velocity = self.velocity(stichtag)
         if velocity == 0:
             return None
 
-        monate_bis_abschluss = self.offene_ects / velocity
+        offene_ects = max(
+            self.gesamt_ects - self.ects_fuer_status(ModulStatus.FERTIG, ModulStatus.ANERKANNT),
+            0,
+        )
+        monate_bis_abschluss = offene_ects / velocity
         tage_bis_abschluss = round(monate_bis_abschluss * 30.4375)
         return stichtag + timedelta(days=tage_bis_abschluss)
 

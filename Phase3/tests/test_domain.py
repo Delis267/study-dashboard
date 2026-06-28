@@ -342,37 +342,6 @@ class StudiumTest(unittest.TestCase):
 
         self.assertEqual(15, studium.ects_fuer_status(ModulStatus.FERTIG, ModulStatus.ANERKANNT))
 
-    def test_erreichte_ects_enthalten_fertige_und_anerkannte_module(self) -> None:
-        studium = self._studium_mit_fertigem_anerkanntem_und_offenem_modul()
-
-        self.assertEqual(15, studium.erreichte_ects)
-
-    def test_eigenleistung_ects_enthalten_nur_fertige_module(self) -> None:
-        studium = self._studium_mit_fertigem_anerkanntem_und_offenem_modul()
-
-        self.assertEqual(10, studium.eigenleistung_ects)
-
-    def test_offene_ects_sind_ziel_minus_erreichte_ects(self) -> None:
-        studium = self._studium_mit_fertigem_anerkanntem_und_offenem_modul(
-            gesamt_ects=20
-        )
-
-        self.assertEqual(5, studium.offene_ects)
-
-    def test_offene_ects_werden_nicht_negativ(self) -> None:
-        studium = self._studium_mit_fertigem_anerkanntem_und_offenem_modul(
-            gesamt_ects=10
-        )
-
-        self.assertEqual(0, studium.offene_ects)
-
-    def test_fortschritt_prozent_wird_auf_zwei_nachkommastellen_gerundet(self) -> None:
-        studium = self._studium_mit_fertigem_anerkanntem_und_offenem_modul(
-            gesamt_ects=18
-        )
-
-        self.assertEqual(83.33, studium.fortschritt_prozent)
-
     def test_notendurchschnitt_ist_none_wenn_keine_note_vorliegt(self) -> None:
         studium = self._test_studium()
 
