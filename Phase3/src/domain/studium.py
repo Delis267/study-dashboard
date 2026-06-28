@@ -87,8 +87,6 @@ class Studium:
     @property
     def ziel_velocity(self) -> float:
         monate = self._monate_seit_start(self.zieldatum)
-        if monate == 0:
-            return 0.0
         return round(self.gesamt_ects / monate, 2)
 
     def velocity(self, stichtag: date) -> float:

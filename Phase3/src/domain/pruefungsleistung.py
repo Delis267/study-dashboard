@@ -52,11 +52,3 @@ class Pruefungsleistung:
             and not self.letzter_versuch.ist_bestanden
             and len(self._versuche) >= MAX_VERSUCHE
         )
-
-    def __str__(self) -> str:
-        return (
-            f"Pruefungsleistung("
-            f"pruefungsform={self.pruefungsform}, "
-            f"versuche={self.versuche_anzahl}, "
-            f"letzter_versuch={self.letzter_versuch})"
-        )

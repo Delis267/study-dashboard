@@ -203,7 +203,7 @@ class ModulBearbeitenDialog:
             side="right",
             padx=(8, 0),
         )
-        ttk.Button(button_frame, text="Modul loeschen", command=self._loeschen).pack(
+        ttk.Button(button_frame, text="Löschen", command=self._loeschen).pack(
             side="right"
         )
 

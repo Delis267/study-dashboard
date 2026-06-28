@@ -10,7 +10,3 @@ class Pruefungsform(Enum):
     SEMINAR = "Seminar"
     PRAESENTATION = "Praesentation"
     BACHELORARBEIT = "Bachelorarbeit"
-
-    def __str__(self) -> str:
-        return self.name
-
