@@ -1,0 +1,403 @@
+{
+    "studiengang": "Software Engineering",
+    "startdatum": "2024-03-01",
+    "zieldatum": "2027-03-01",
+    "gesamt_ects": 180,
+    "ziel_notendurchschnitt": 2.0,
+    "module": [
+        {
+            "kurs_id": "IGIS01",
+            "kursname": "Grundlagen der industriellen Softwaretechnik",
+            "ects": 5,
+            "pruefungsleistung": null
+        },
+        {
+            "kurs_id": "DLBWIRITT01",
+            "kursname": "Einführung in das wissenschaftliche Arbeiten für IT und Technik",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "ADVANCED_WORKBOOK",
+                "versuche": [
+                    {
+                        "note": 1.0
+                    }
+                ]
+            }
+        },
+        {
+            "kurs_id": "IREN01",
+            "kursname": "Requirements Engineering",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "KLAUSUR",
+                "versuche": [
+                    {
+                        "note": 1.3
+                    }
+                ]
+            }
+        },
+        {
+            "kurs_id": "ISPE01",
+            "kursname": "Spezifikation",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "KLAUSUR",
+                "versuche": [
+                    {
+                        "note": 1.7
+                    }
+                ]
+            }
+        },
+        {
+            "kurs_id": "IOBP01",
+            "kursname": "Grundlagen der objektorientierten Programmierung mit Java",
+            "ects": 5,
+            "pruefungsleistung": null
+        },
+        {
+            "kurs_id": "IDBS01",
+            "kursname": "Datenmodellierung und Datenbanksysteme",
+            "ects": 5,
+            "pruefungsleistung": null
+        },
+        {
+            "kurs_id": "DLBCSDSJCL02_D",
+            "kursname": "Datenstruktur und Java-Klassenbibliothek",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "ADVANCED_WORKBOOK",
+                "versuche": [
+                    {
+                        "note": 1.0
+                    }
+                ]
+            }
+        },
+        {
+            "kurs_id": "DLBKA01",
+            "kursname": "Kollaboratives Arbeiten",
+            "ects": 5,
+            "pruefungsleistung": null
+        },
+        {
+            "kurs_id": "IPWA01-01",
+            "kursname": "Programmierung von Web-Anwendungsoberflächen",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "KLAUSUR",
+                "versuche": [
+                    {
+                        "note": 1.3
+                    }
+                ]
+            }
+        },
+        {
+            "kurs_id": "DLBIADPS01",
+            "kursname": "Algorithmen, Datenstrukturen und Programmiersprachen",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "ADVANCED_WORKBOOK",
+                "versuche": [
+                    {
+                        "note": 1.0
+                    }
+                ]
+            }
+        },
+        {
+            "kurs_id": "IQSS01",
+            "kursname": "Qualitätssicherung im Softwareprozess",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "KLAUSUR",
+                "versuche": [
+                    {
+                        "note": 3.0
+                    }
+                ]
+            }
+        },
+        {
+            "kurs_id": "IAMG01",
+            "kursname": "IT-Architekturmanagement",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "KLAUSUR",
+                "versuche": [
+                    {
+                        "note": 1.0
+                    }
+                ]
+            }
+        },
+        {
+            "kurs_id": "IPWA02-01",
+            "kursname": "Programmierung von industriellen Informationssytemen mit Java EE",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "KLAUSUR",
+                "versuche": [
+                    {
+                        "note": 2.0
+                    }
+                ]
+            }
+        },
+        {
+            "kurs_id": "DLBSEPENIT01_D",
+            "kursname": "Ethik und Nachhaltigkeit in der IT",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "HAUSARBEIT",
+                "versuche": [
+                    {
+                        "note": 1.3
+                    }
+                ]
+            }
+        },
+        {
+            "kurs_id": "DLBWIWTMAS01",
+            "kursname": "Techniken und Methoden der agilen Softwareentwicklung",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "PROJEKT",
+                "versuche": [
+                    {
+                        "note": 1.3
+                    }
+                ]
+            }
+        },
+        {
+            "kurs_id": "DLBCSEMSE01_D",
+            "kursname": "Mobile Software Engineering I",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "KLAUSUR",
+                "versuche": [
+                    {
+                        "note": 1.7
+                    }
+                ]
+            }
+        },
+        {
+            "kurs_id": "ISSE01",
+            "kursname": "Seminar \"Software Engineering\"",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "SEMINAR",
+                "versuche": []
+            }
+        },
+        {
+            "kurs_id": "IWNF02",
+            "kursname": "Projekt Agiles Software Engineering",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "PROJEKT",
+                "versuche": [
+                    {
+                        "note": 2.0
+                    }
+                ]
+            }
+        },
+        {
+            "kurs_id": "DLBSEPITI01_D",
+            "kursname": "IT-Infrastruktur",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "KLAUSUR",
+                "versuche": [
+                    {
+                        "note": 2.7
+                    }
+                ]
+            }
+        },
+        {
+            "kurs_id": "IWSM01",
+            "kursname": "IT-Service Management",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "KLAUSUR",
+                "versuche": [
+                    {
+                        "note": 2.0
+                    }
+                ]
+            }
+        },
+        {
+            "kurs_id": "DLBCSEMSE02_D",
+            "kursname": "Projekt: Mobile Software Engineering II",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "PROJEKT",
+                "versuche": [
+                    {
+                        "note": 5.0
+                    },
+                    {
+                        "note": 1.3
+                    }
+                ]
+            }
+        },
+        {
+            "kurs_id": "DLBSEPCP01_D",
+            "kursname": "Cloud Programming",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "PORTFOLIO",
+                "versuche": []
+            }
+        },
+        {
+            "kurs_id": "DLBISIC01",
+            "kursname": "Einführung in Datenschutz und IT-Sicherheit",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "KLAUSUR",
+                "versuche": []
+            }
+        },
+        {
+            "kurs_id": "DLBSEPDOCD01_D",
+            "kursname": "DevOps und Continuous Delivery",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "PROJEKT",
+                "versuche": [
+                    {
+                        "note": 1.3
+                    }
+                ]
+            }
+        },
+        {
+            "kurs_id": "DLBMIUID01",
+            "kursname": "Gestaltung und Ergonomie von User Interfaces",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "KLAUSUR",
+                "versuche": [
+                    {
+                        "note": 2.3
+                    }
+                ]
+            }
+        },
+        {
+            "kurs_id": "DLBDSIPWP01_D",
+            "kursname": "Einführung in die Programmierung mit Python",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "KLAUSUR",
+                "versuche": [
+                    {
+                        "note": 2.0
+                    }
+                ]
+            }
+        },
+        {
+            "kurs_id": "DLBSEPPSD01_D",
+            "kursname": "Projekt: Software Development",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "PRAESENTATION",
+                "versuche": []
+            }
+        },
+        {
+            "kurs_id": "WAHL1",
+            "kursname": "Einführung in Data Science",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "ADVANCED_WORKBOOK",
+                "versuche": [
+                    {
+                        "note": 1.0
+                    }
+                ]
+            }
+        },
+        {
+            "kurs_id": "WAHL2",
+            "kursname": "OOP-Projekt mit Python",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "PORTFOLIO",
+                "versuche": []
+            }
+        },
+        {
+            "kurs_id": "WAHL3",
+            "kursname": "Artificial Intelligence",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "KLAUSUR",
+                "versuche": [
+                    {
+                        "note": 2.7
+                    }
+                ]
+            }
+        },
+        {
+            "kurs_id": "WAHL4",
+            "kursname": "AI Fluency und generative KI",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "PORTFOLIO",
+                "versuche": []
+            }
+        },
+        {
+            "kurs_id": "WAHL5",
+            "kursname": "Einführung in das Internet of Things",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "KLAUSUR",
+                "versuche": []
+            }
+        },
+        {
+            "kurs_id": "WAHL6",
+            "kursname": "Embedded Systems",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "KLAUSUR",
+                "versuche": []
+            }
+        },
+        {
+            "kurs_id": "BAK",
+            "kursname": "Bachelorarbeit",
+            "ects": 10,
+            "pruefungsleistung": {
+                "pruefungsform": "BACHELORARBEIT",
+                "versuche": []
+            }
+        },
+        {
+            "kurs_id": "TEST1",
+            "kursname": "test",
+            "ects": 5,
+            "pruefungsleistung": {
+                "pruefungsform": "KLAUSUR",
+                "versuche": [
+                    {
+                        "note": 5.0
+                    }
+                ]
+            }
+        }
+    ]
+}

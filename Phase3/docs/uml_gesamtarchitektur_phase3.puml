@@ -1,0 +1,105 @@
+@startuml gesamtarchitektur_uml
+skinparam classAttributeIconSize 0
+top to bottom direction
+
+title Gesamtarchitektur Studien-Dashboard - Ende-Phase 3
+
+package "Bootstrap" {
+  class Application {
+    + starten(filename: str): None
+  }
+}
+
+package "Eingehender Adapter" {
+  class DashboardTkinterApp {
+    + starten(): None
+    + aktualisieren(): None
+    + modul_hinzufuegen(): None
+    + modul_bearbeiten(...): None
+    + modul_loeschen(...): None
+  }
+}
+
+package "Ausgehender Adapter" {
+  class JsonStudiumRepository {
+    - dateiname: Path
+    + laden(): Studium
+    + speichern(studium: Studium): None
+  }
+}
+
+rectangle "Anwendungskern" {
+  package "Input-Port" {
+    interface StudienAnalyseUseCase {
+      + dashboard_daten_abrufen(stichtag: date | None)
+    }
+
+    interface StudiumBearbeitenUseCase {
+      + modul_hinzufuegen(...): None
+      + modul_loeschen(kurs_id: str): None
+      + modul_bearbeiten(...): None
+    }
+  }
+
+  package "Anwendungsschicht" {
+    class StudienAnalyseService
+    class StudiumBearbeitenService
+  }
+
+  package "Output-Port" {
+    interface StudiumRepositoryPort {
+      + laden(): Studium
+      + speichern(studium: Studium): None
+    }
+  }
+
+  package "Domaene" {
+    class Studium
+    class Modul
+    class Pruefungsleistung
+    class Pruefungsversuch
+
+    enum ModulStatus
+    enum Pruefungsform
+  }
+  note right of Modul
+    Anerkannte Module besitzen keine Pruefungsleistung.
+    Der Status wird aus den vorhandenen Fachdaten abgeleitet.
+  end note
+
+}
+
+Application --> DashboardTkinterApp : startet
+Application --> StudienAnalyseService : verdrahtet
+Application --> StudiumBearbeitenService : verdrahtet
+Application --> JsonStudiumRepository : verdrahtet
+
+DashboardTkinterApp --> StudienAnalyseUseCase : nutzt
+DashboardTkinterApp --> StudiumBearbeitenUseCase : nutzt
+
+StudienAnalyseService ..|> StudienAnalyseUseCase : implementiert
+StudiumBearbeitenService ..|> StudiumBearbeitenUseCase : implementiert
+
+StudienAnalyseService --> StudiumRepositoryPort : verwendet
+StudiumBearbeitenService --> StudiumRepositoryPort : verwendet
+JsonStudiumRepository ..|> StudiumRepositoryPort : implementiert
+JsonStudiumRepository --> Studium : rekonstruiert/persistiert
+JsonStudiumRepository --> Modul : rekonstruiert/persistiert
+
+StudienAnalyseService --> Studium : liest
+StudiumBearbeitenService --> Studium : veraendert
+
+Studium "1" *-- "0..*" Modul : enthaelt
+Modul "1" *-- "0..1" Pruefungsleistung : besitzt optional
+Pruefungsleistung "1" *-- "0..3" Pruefungsversuch : verwaltet
+
+Modul --> ModulStatus : leitet ab
+Pruefungsleistung --> Pruefungsform : verwendet
+
+note top of Application
+  Composition Root:
+  erstellt Repository, Services und UI
+  und verdrahtet die Abhaengigkeiten.
+end note
+
+@enduml

@@ -1,0 +1,92 @@
+@startuml domain_uml
+skinparam classAttributeIconSize 0
+
+title Domain-Klassen Studien-Dashboard - Ende-Phase 3
+
+class Studium {
+  - studiengang: str
+  - startdatum: date
+  - zieldatum: date
+  - gesamt_ects: int
+  - ziel_notendurchschnitt: float
+  - module: list[Modul]
+  --
+  + modul_hinzufuegen(modul: Modul): None
+  + modul_finden(kurs_id: str): Modul | None
+  + modul_entfernen(kurs_id: str): None
+  + ects_fuer_status(...status_filter: ModulStatus): int
+  + gewichteter_notendurchschnitt: float | None <<property>>
+  + ziel_notendurchschnitt_erreicht: bool | None <<property>>
+  + ziel_velocity: float <<property>>
+  + velocity(stichtag: date): float
+  + prognostiziertes_ende(stichtag: date): date | None
+}
+
+class Modul {
+  - kurs_id: str
+  - kursname: str
+  - ects: int
+  - pruefungsleistung: Pruefungsleistung | None
+  --
+  + regulaer(kurs_id: str, kursname: str, ects: int, pruefungsform: Pruefungsform): Modul <<factory>>
+  + anerkannt(kurs_id: str, kursname: str, ects: int): Modul <<factory>>
+  + ist_anerkannt: bool <<property>>
+  + status: ModulStatus <<property>>
+  + aktuelle_note: float | None <<property>>
+  + note_eintragen(note: float): None
+  + pruefungsform_aendern(pruefungsform: Pruefungsform): None
+  + basisdaten_aendern(kursname: str | None, ects: int | None): None
+}
+
+class Pruefungsleistung {
+  - pruefungsform: Pruefungsform
+  - _versuche: list[Pruefungsversuch]
+  --
+  + versuch_eintragen(note: float): None
+  + pruefungsform_aendern(pruefungsform: Pruefungsform): None
+  + versuche: tuple[Pruefungsversuch, ...] <<property>>
+  + versuche_anzahl: int <<property>>
+  + letzter_versuch: Pruefungsversuch | None <<property>>
+  + ist_bestanden: bool <<property>>
+}
+
+class Pruefungsversuch {
+  - note: float
+  --
+  + ist_bestanden: bool <<property>>
+}
+
+
+enum Pruefungsform {
+  KLAUSUR
+  ADVANCED_WORKBOOK
+  HAUSARBEIT
+  PORTFOLIO
+  PROJEKT
+  SEMINAR
+  PRAESENTATION
+  BACHELORARBEIT
+}
+
+enum ModulStatus {
+  OFFEN
+  IN_ARBEIT
+  FERTIG
+  ANERKANNT
+}
+
+Studium "1" *-- "0..*" Modul : enthaelt
+Modul "1" *-- "0..1" Pruefungsleistung : besitzt optional
+Pruefungsleistung "1" *-- "0..3" Pruefungsversuch : verwaltet
+
+Pruefungsleistung --> Pruefungsform : verwendet
+Modul --> ModulStatus : leitet ab
+
+note top of Pruefungsversuch
+  @dataclass(frozen=True)
+  Ein Pruefungsversuch ist nach dem Anlegen unveraenderlich.
+  Die erlaubten Notenwerte werden beim Erzeugen validiert.
+  Manipulationen an der Note sind nicht erlaubt um invaidierte Zustände zu vermeiden.
+end note
+
+@enduml
