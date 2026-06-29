@@ -1,10 +1,6 @@
 ﻿# Installationsanleitung Studien-Dashboard
 
-GitHub-Repository: <https://github.com/Delis267/study-dashboard>
-
 ## Projekt herunterladen
-
-Das Repository kann über PowerShell geklont werden:
 
 ```powershell
 git clone https://github.com/Delis267/study-dashboard.git
@@ -20,7 +16,7 @@ cd Phase3
 python run_application.py
 ```
 
-Alternative
+Alternative über das Bootstrap-Modul (Composition-Root)
 ```powershell
 cd Phase3/src
 python -m bootstrap.main
@@ -28,12 +24,13 @@ python -m bootstrap.main
 
 
 Danach öffnet sich die Tkinter-Oberfläche des Studien-Dashboards. Die Anwendung lädt die Beispieldaten aus:
-
 ```text
-Phase3/data/studium.json
+Phase3\src\data\studium.json
 ```
+Die Oberfläche sieht wie folgt aus:
+![Python-Oberfläche](Phase3/docs/python_ui.png)
 
-In der Oberfläche können Module angezeigt, hinzugefügt, bearbeitet und gelöscht werden. Außerdem werden Kennzahlen wie ECTS-Fortschritt, Notenschnitt, Velocity und Prognose angezeigt.
+In der Oberfläche können Module angezeigt, hinzugefügt, bearbeitet und gelöscht werden. Studiumsgrunddaten müssen in der JSON-Datei manuell verändert werden. Funktionierende Testdaten sind allerdings bereits anlegt.
 
 ## Tests ausführen
 
@@ -52,7 +49,7 @@ python run_tests.py
 
 ## Hinweise zur Projektstruktur
 
-Jede Projektphase besitzt ein eigenes Hauptverzeichnis: `Phase1`, `Phase2` und `Phase3`.
+Jede Projektphase besitzt ein eigenes Hauptverzeichnis: `Phase1`, `Phase2` und `Phase3` und darin eine eigene Readme.
 
 Die Verzeichnisse sind ähnlich aufgebaut:
 
