@@ -62,7 +62,12 @@ rectangle "Anwendungskern" {
     enum ModulStatus
     enum Pruefungsform
   }
-  note right of Modul
+
+  note left of Studium
+    Das Studium wird über den StudiumRepositoryPort geladen und gespeichert.
+  end note
+
+  note left of Modul
     Anerkannte Module besitzen keine Pruefungsleistung.
     Der Status wird aus den vorhandenen Fachdaten abgeleitet.
   end note
@@ -83,11 +88,10 @@ StudiumBearbeitenService ..|> StudiumBearbeitenUseCase : implementiert
 StudienAnalyseService --> StudiumRepositoryPort : verwendet
 StudiumBearbeitenService --> StudiumRepositoryPort : verwendet
 JsonStudiumRepository ..|> StudiumRepositoryPort : implementiert
-JsonStudiumRepository --> Studium : rekonstruiert/persistiert
-JsonStudiumRepository --> Modul : rekonstruiert/persistiert
 
-StudienAnalyseService --> Studium : liest
-StudiumBearbeitenService --> Studium : veraendert
+StudienAnalyseService -[hidden]down-> Studium
+StudiumBearbeitenService -[hidden]down-> Modul
+StudiumRepositoryPort -[hidden]down-> Studium
 
 Studium "1" *-- "0..*" Modul : enthaelt
 Modul "1" *-- "0..1" Pruefungsleistung : besitzt optional
