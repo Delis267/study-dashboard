@@ -29,6 +29,7 @@ class Pruefungsleistung:
         
     @property
     def versuche(self) -> tuple[Pruefungsversuch, ...]:
+        ''' Gibt eine unveränderliche Ansicht der Versuche zurück.'''
         return tuple(self._versuche)
 
     @property
@@ -44,11 +45,3 @@ class Pruefungsleistung:
     @property
     def ist_bestanden(self) -> bool:
         return self.letzter_versuch is not None and self.letzter_versuch.ist_bestanden
-
-    @property
-    def ist_endgueltig_nicht_bestanden(self) -> bool:
-        return (
-            self.letzter_versuch is not None
-            and not self.letzter_versuch.ist_bestanden
-            and len(self._versuche) >= MAX_VERSUCHE
-        )

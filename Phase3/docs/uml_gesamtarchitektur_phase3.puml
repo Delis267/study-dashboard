@@ -1,8 +1,8 @@
-@startuml
+@startuml Gesamtarchitektur
 skinparam classAttributeIconSize 0
 top to bottom direction
 
-title Gesamtarchitektur Studien-Dashboard - Phase 3
+title Gesamtarchitektur Studien-Dashboard - Ende-Phase 3
 
 package "Bootstrap" {
   class Application {

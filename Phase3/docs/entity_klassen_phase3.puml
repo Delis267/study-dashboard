@@ -1,7 +1,7 @@
-@startuml
+@startuml domain_klassen
 skinparam classAttributeIconSize 0
 
-title Entity-Klassen Studien-Dashboard - Phase 3
+title Domain-Klassen Studien-Dashboard - Ende-Phase 3
 
 class Studium {
   - studiengang: str
@@ -20,7 +20,6 @@ class Studium {
   + ziel_velocity: float <<property>>
   + velocity(stichtag: date): float
   + prognostiziertes_ende(stichtag: date): date | None
-  - _monate_seit_start(stichtag: date): float
 }
 
 class Modul {
@@ -49,7 +48,6 @@ class Pruefungsleistung {
   + versuche_anzahl: int <<property>>
   + letzter_versuch: Pruefungsversuch | None <<property>>
   + ist_bestanden: bool <<property>>
-  + ist_endgueltig_nicht_bestanden: bool <<property>>
 }
 
 class Pruefungsversuch {
@@ -58,11 +56,6 @@ class Pruefungsversuch {
   + ist_bestanden: bool <<property>>
 }
 
-note top of Pruefungsversuch
-  @dataclass(frozen=True)
-  Ein Pruefungsversuch ist nach dem Anlegen unveraenderlich.
-  Die erlaubten Notenwerte werden beim Erzeugen validiert.
-end note
 
 enum Pruefungsform {
   KLAUSUR
@@ -89,26 +82,11 @@ Pruefungsleistung "1" *-- "0..3" Pruefungsversuch : verwaltet
 Pruefungsleistung --> Pruefungsform : verwendet
 Modul --> ModulStatus : leitet ab
 
-note right of Modul
-  Anerkannte Module besitzen keine Pruefungsleistung.
-  Regulaere Module besitzen genau eine Pruefungsleistung.
-  Der ModulStatus wird aus der Pruefungsleistung
-  und den Pruefungsversuchen abgeleitet.
-end note
-
-note top of Pruefungsleistung
-  Die Pruefungsleistung kapselt die pruefungsbezogene Logik:
-  Sie verwaltet die Pruefungsform und die Pruefungsversuche,
-  begrenzt die Anzahl der Versuche auf maximal drei
-  und entscheidet, ob die Pruefung bestanden wurde.
-end note
-
-note left of Pruefungsversuch
-  Der Pruefungsversuch speichert keine Versuchsnummer.
-  Die Anzahl und Reihenfolge ergeben sich aus der Liste
-  in Pruefungsleistung.
-  Persistiert wird er als Objekt, z.B. {"note": 2.3},
-  nicht nur als reine Zahlenliste.
+note top of Pruefungsversuch
+  @dataclass(frozen=True)
+  Ein Pruefungsversuch ist nach dem Anlegen unveraenderlich.
+  Die erlaubten Notenwerte werden beim Erzeugen validiert.
+  Manipulationen an der Note sind nicht erlaubt um invaidierte Zustände zu vermeiden.
 end note
 
 @enduml
