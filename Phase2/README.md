@@ -7,6 +7,7 @@ python run_tests.py
 ```
 
 Das startet die OOP-Tests und den JSON-Repository-Test.
+Ab Phase2 sind die Tests jeweils Python-Module, da sie voneinander abhängen.
 
 Einzelne Tests können optional separat gestartet werden:
 

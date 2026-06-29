@@ -22,3 +22,4 @@ if CSV_DATEI.exists():
 
 run("csv_repository_test.py")
 run("prognose_test.py")
+run("gui_test.py")

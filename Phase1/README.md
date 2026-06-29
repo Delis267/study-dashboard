@@ -2,15 +2,18 @@
 
 Im Ordner `Phase1` ausführen:
 
+run_tests.py ist ein Hilfsprogramm, dass alle Testprogramme dieser Phase nacheinander startet.
+
 ```powershell
 python run_tests.py
 ```
 
-Das startet die Konsolentests für CSV-Repository und Prognose.
-
-Der GUI-Machbarkeitstest kann optional separat gestartet werden:
+Einzeln können die Tests gestartet werden indem man in den /src Ordner wechelt.
 
 ```powershell
 cd src
+
+python prognose_test.py
+python csv_repository_test.py
 python gui_test.py
 ```

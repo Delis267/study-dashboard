@@ -13,7 +13,7 @@ cd study-dashboard
 
 ## Anwendung starten
 
-Die Anwendung befindet sich im Ordner `Phase3`. Zum Starten bitte folgende Befehle ausführen:
+Die fertige Anwendung befindet sich im Ordner `Phase3`. Zum Starten bitte folgende Befehle ausführen:
 
 ```powershell
 cd Phase3
@@ -45,6 +45,7 @@ python run_tests.py
 
 ## Hinweise zur Bedienung
 
+- Die Anwendung untersützt keinen Darkmode
 - Ein neues Modul wird über die Schaltfläche `Neues Modul hinzufügen` angelegt.
 - Ein vorhandenes Modul kann per Doppelklick in der Tabelle bearbeitet oder gelöscht werden.
 - Die Modultabelle lässt sich mit Klick auf den Tabellenkopf sortieren.
