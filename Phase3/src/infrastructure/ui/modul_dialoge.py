@@ -7,15 +7,23 @@ from domain.pruefungsform import Pruefungsform
 from domain.pruefungsversuch import ERLAUBTE_NOTEN
 
 
-def popup_am_cursor_platzieren(
+def popup_in_anwendung_zentrieren(
     dialog: tk.Toplevel,
     parent: tk.Tk,
     breite: int = 640,
 ) -> None:
+    parent.update_idletasks()
     dialog.update_idletasks()
     hoehe = dialog.winfo_reqheight()
-    x = parent.winfo_pointerx()
-    y = parent.winfo_pointery()
+
+    parent_breite = parent.winfo_width()
+    parent_hoehe = parent.winfo_height()
+    parent_x = parent.winfo_rootx()
+    parent_y = parent.winfo_rooty()
+
+    x = parent_x + (parent_breite - breite) // 2
+    y = parent_y + (parent_hoehe - hoehe) // 2
+
     max_x = max(dialog.winfo_screenwidth() - breite - 12, 0)
     max_y = max(dialog.winfo_screenheight() - hoehe - 48, 0)
     x = min(max(x, 12), max_x)
@@ -90,7 +98,7 @@ class ModulHinzufuegenDialog:
         frame.columnconfigure(1, weight=1)
         self.dialog.bind("<Return>", lambda _event: self._speichern())
         self.dialog.bind("<Escape>", lambda _event: self.dialog.destroy())
-        popup_am_cursor_platzieren(self.dialog, parent)
+        popup_in_anwendung_zentrieren(self.dialog, parent)
 
     def anzeigen(self) -> dict[str, object] | None:
         self.dialog.wait_window()
@@ -210,7 +218,7 @@ class ModulBearbeitenDialog:
         frame.columnconfigure(1, weight=1)
         self.dialog.bind("<Return>", lambda _event: self._speichern())
         self.dialog.bind("<Escape>", lambda _event: self.dialog.destroy())
-        popup_am_cursor_platzieren(self.dialog, parent)
+        popup_in_anwendung_zentrieren(self.dialog, parent)
 
     def anzeigen(self) -> dict[str, object] | None:
         self.dialog.wait_window()
