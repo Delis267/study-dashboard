@@ -40,6 +40,14 @@ class Modul:
             pruefungsleistung=None,
         )
 
+    def __post_init__(self) -> None:
+        if not self.kurs_id.strip():
+            raise ValueError("Die Kurs-ID darf nicht leer sein.")
+        if not self.kursname.strip():
+            raise ValueError("Der Kursname darf nicht leer sein.")
+        if self.ects <= 0:
+            raise ValueError("ECTS muessen groesser als 0 sein.")
+        
     @property
     def ist_anerkannt(self) -> bool:
         return self.pruefungsleistung is None
@@ -53,14 +61,14 @@ class Modul:
         if self.pruefungsleistung.ist_bestanden:
             return ModulStatus.FERTIG
         return ModulStatus.IN_ARBEIT
-
-    def __post_init__(self) -> None:
-        if not self.kurs_id.strip():
-            raise ValueError("Die Kurs-ID darf nicht leer sein.")
-        if not self.kursname.strip():
-            raise ValueError("Der Kursname darf nicht leer sein.")
-        if self.ects <= 0:
-            raise ValueError("ECTS muessen groesser als 0 sein.")
+    
+    @property
+    def aktuelle_note(self) -> float | None:
+        if self.pruefungsleistung is None or self.pruefungsleistung.letzter_versuch is None:
+            return None
+        if not self.pruefungsleistung.ist_bestanden:
+            return None
+        return self.pruefungsleistung.letzter_versuch.note
 
     def note_eintragen(self, note: float) -> None:
         if self.ist_anerkannt:
@@ -88,11 +96,3 @@ class Modul:
             if ects <= 0:
                 raise ValueError("ECTS muessen groesser als 0 sein.")
             self.ects = ects
-
-    @property
-    def aktuelle_note(self) -> float | None:
-        if self.pruefungsleistung is None or self.pruefungsleistung.letzter_versuch is None:
-            return None
-        if not self.pruefungsleistung.ist_bestanden:
-            return None
-        return self.pruefungsleistung.letzter_versuch.note
