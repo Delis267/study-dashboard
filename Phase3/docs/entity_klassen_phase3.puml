@@ -1,4 +1,4 @@
-@startuml domain_klassen
+@startuml domain_uml
 skinparam classAttributeIconSize 0
 
 title Domain-Klassen Studien-Dashboard - Ende-Phase 3
