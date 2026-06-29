@@ -29,6 +29,8 @@ class DashboardDatenResponse:
     gesamt_ects: int
     erreichte_ects: int
     offene_ects: int
+    geplante_ects: int
+    ungeplante_ects: int
     fortschritt_prozent: float
     ects_nach_status: dict[ModulStatus, int]
     notendurchschnitt: float | None

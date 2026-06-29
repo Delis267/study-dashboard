@@ -161,7 +161,41 @@ class InputPortsTest(unittest.TestCase):
 
         self.assertEqual(15, dashboard_daten.erreichte_ects)
         self.assertEqual(3, dashboard_daten.offene_ects)
+        self.assertEqual(20, dashboard_daten.geplante_ects)
+        self.assertEqual(0, dashboard_daten.ungeplante_ects)
         self.assertEqual(83.33, dashboard_daten.fortschritt_prozent)
+
+    def test_analyse_service_unterscheidet_offene_und_ungeplante_ects(self) -> None:
+        repository = InMemoryStudiumRepository(self._studium(gesamt_ects=30))
+        bearbeiten_service = StudiumBearbeitenService(repository)
+        analyse_service: StudienAnalyseUseCase = StudienAnalyseService(repository)
+
+        bearbeiten_service.modul_hinzufuegen(
+            ModulHinzufuegenRequest(
+                kurs_id="OOP",
+                kursname="Objektorientierte Programmierung",
+                ects=10,
+                pruefungsform=Pruefungsform.PORTFOLIO,
+                note=2.3,
+            )
+        )
+        bearbeiten_service.modul_hinzufuegen(
+            ModulHinzufuegenRequest(
+                kurs_id="DB",
+                kursname="Datenbanken",
+                ects=5,
+                pruefungsform=Pruefungsform.KLAUSUR,
+            )
+        )
+
+        dashboard_daten = analyse_service.dashboard_daten_abrufen(
+            stichtag=date(2025, 7, 1)
+        )
+
+        self.assertEqual(10, dashboard_daten.erreichte_ects)
+        self.assertEqual(20, dashboard_daten.offene_ects)
+        self.assertEqual(15, dashboard_daten.geplante_ects)
+        self.assertEqual(15, dashboard_daten.ungeplante_ects)
 
     def test_analyse_service_liefert_pruefungsversuche_fuer_frontend(self) -> None:
         repository = InMemoryStudiumRepository(self._studium())

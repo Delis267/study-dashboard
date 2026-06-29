@@ -11,6 +11,7 @@ from infrastructure.ui.modul_dialoge import ModulBearbeitenDialog, ModulHinzufue
 
 class DashboardTkinterApp:
     KENNZAHL_BOX_HOEHE = 104
+    UNGEPLANTE_ECTS_KEY = "UNGEPLANT"
 
     def __init__(
         self,
@@ -82,7 +83,7 @@ class DashboardTkinterApp:
         self.legende_canvas = tk.Canvas(
             kopf_oben,
             width=210,
-            height=130,
+            height=150,
             background="white",
             highlightthickness=0,
         )
@@ -292,7 +293,10 @@ class DashboardTkinterApp:
             text=f"{daten.erreichte_ects}/{daten.gesamt_ects}"
         )
         self.kennzahl_boxen["ECTS"]["sekundaer"].configure(
-            text=f"{daten.fortschritt_prozent} % fertig\n{daten.offene_ects} ECTS offen"
+            text=(
+                f"{daten.fortschritt_prozent} % fertig, {daten.offene_ects} ECTS offen\n"
+                f"{daten.geplante_ects} geplant, {daten.ungeplante_ects} ungeplant"
+            )
         )
 
         notenschnitt = "-" if daten.notendurchschnitt is None else daten.notendurchschnitt
@@ -319,7 +323,7 @@ class DashboardTkinterApp:
 
     def _donut_zeichnen(self, daten: DashboardDatenResponse) -> None:
         self.donut_canvas.delete("all")
-        farben = self._status_farben()
+        farben = self._donut_farben()
         werte = [
             (status, daten.ects_nach_status.get(status, 0))
             for status in (
@@ -329,6 +333,7 @@ class DashboardTkinterApp:
                 ModulStatus.OFFEN,
             )
         ]
+        werte.append((self.UNGEPLANTE_ECTS_KEY, daten.ungeplante_ects))
         gesamt = sum(wert for _status, wert in werte)
         if gesamt == 0:
             self.donut_canvas.create_text(90, 90, text="0 ECTS")
@@ -356,16 +361,17 @@ class DashboardTkinterApp:
 
     def _legende_zeichnen(self, daten: DashboardDatenResponse) -> None:
         self.legende_canvas.delete("all")
-        farben = self._status_farben()
+        farben = self._donut_farben()
         eintraege = (
             (ModulStatus.ANERKANNT, "anerkannt"),
             (ModulStatus.FERTIG, "fertig"),
             (ModulStatus.IN_ARBEIT, "in Arbeit"),
-            (ModulStatus.OFFEN, "offen"),
+            (ModulStatus.OFFEN, "geplant offen"),
+            (self.UNGEPLANTE_ECTS_KEY, "ungeplant"),
         )
         for index, (status, beschriftung) in enumerate(eintraege):
             y = 14 + index * 28
-            ects = daten.ects_nach_status.get(status, 0)
+            ects = self._ects_fuer_legenden_status(daten, status)
             self.legende_canvas.create_rectangle(
                 4,
                 y,
@@ -476,8 +482,7 @@ class DashboardTkinterApp:
     def _velocity_hinweis(self, daten: DashboardDatenResponse) -> str:
         if daten.ziel_velocity_ects_pro_monat <= daten.velocity_ects_pro_monat:
             return "erreicht"
-        if daten.ziel_velocity_ects_pro_monat >= daten.ziel_velocity_ects_pro_monat:
-            return "nicht erreicht"
+        return "nicht erreicht"
 
     def _prognose_hinweis(self, daten: DashboardDatenResponse) -> str:
         if daten.prognostiziertes_ende is None:
@@ -493,3 +498,17 @@ class DashboardTkinterApp:
             ModulStatus.IN_ARBEIT: "#ffd768",
             ModulStatus.OFFEN: "#9fc8ee",
         }
+
+    def _donut_farben(self) -> dict[ModulStatus | str, str]:
+        farben: dict[ModulStatus | str, str] = self._status_farben()
+        farben[self.UNGEPLANTE_ECTS_KEY] = "#e6e6e6"
+        return farben
+
+    def _ects_fuer_legenden_status(
+        self,
+        daten: DashboardDatenResponse,
+        status: ModulStatus | str,
+    ) -> int:
+        if status == self.UNGEPLANTE_ECTS_KEY:
+            return daten.ungeplante_ects
+        return daten.ects_nach_status.get(status, 0)

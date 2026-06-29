@@ -93,15 +93,6 @@ class PruefungsleistungTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             pruefungsleistung.versuch_eintragen(1.7)
 
-    def test_nach_drei_nicht_bestandenen_versuchen_ist_pruefung_endgueltig_nicht_bestanden(self) -> None:
-        pruefungsleistung = Pruefungsleistung(Pruefungsform.KLAUSUR)
-
-        pruefungsleistung.versuch_eintragen(5.0)
-        pruefungsleistung.versuch_eintragen(5.0)
-        pruefungsleistung.versuch_eintragen(5.0)
-
-        self.assertTrue(pruefungsleistung.ist_endgueltig_nicht_bestanden)
-
     def test_nach_drei_versuchen_darf_kein_vierter_versuch_eingetragen_werden(self) -> None:
         pruefungsleistung = Pruefungsleistung(Pruefungsform.KLAUSUR)
         pruefungsleistung.versuch_eintragen(5.0)

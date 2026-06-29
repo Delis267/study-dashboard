@@ -191,7 +191,11 @@
             "ects": 5,
             "pruefungsleistung": {
                 "pruefungsform": "SEMINAR",
-                "versuche": []
+                "versuche": [
+                    {
+                        "note": 3.3
+                    }
+                ]
             }
         },
         {
@@ -250,21 +254,16 @@
             }
         },
         {
-            "kurs_id": "DLBSEPCP01_D",
-            "kursname": "Cloud Programming",
-            "ects": 5,
-            "pruefungsleistung": {
-                "pruefungsform": "PORTFOLIO",
-                "versuche": []
-            }
-        },
-        {
             "kurs_id": "DLBISIC01",
             "kursname": "Einführung in Datenschutz und IT-Sicherheit",
             "ects": 5,
             "pruefungsleistung": {
                 "pruefungsform": "KLAUSUR",
-                "versuche": []
+                "versuche": [
+                    {
+                        "note": 3.0
+                    }
+                ]
             }
         },
         {
@@ -294,25 +293,16 @@
             }
         },
         {
-            "kurs_id": "DLBDSIPWP01_D",
-            "kursname": "Einführung in die Programmierung mit Python",
-            "ects": 5,
-            "pruefungsleistung": {
-                "pruefungsform": "KLAUSUR",
-                "versuche": [
-                    {
-                        "note": 2.0
-                    }
-                ]
-            }
-        },
-        {
             "kurs_id": "DLBSEPPSD01_D",
             "kursname": "Projekt: Software Development",
             "ects": 5,
             "pruefungsleistung": {
                 "pruefungsform": "PRAESENTATION",
-                "versuche": []
+                "versuche": [
+                    {
+                        "note": 1.7
+                    }
+                ]
             }
         },
         {
@@ -334,18 +324,9 @@
             "ects": 5,
             "pruefungsleistung": {
                 "pruefungsform": "PORTFOLIO",
-                "versuche": []
-            }
-        },
-        {
-            "kurs_id": "WAHL3",
-            "kursname": "Artificial Intelligence",
-            "ects": 5,
-            "pruefungsleistung": {
-                "pruefungsform": "KLAUSUR",
                 "versuche": [
                     {
-                        "note": 2.7
+                        "note": 3.0
                     }
                 ]
             }
@@ -356,25 +337,11 @@
             "ects": 5,
             "pruefungsleistung": {
                 "pruefungsform": "PORTFOLIO",
-                "versuche": []
-            }
-        },
-        {
-            "kurs_id": "WAHL5",
-            "kursname": "Einführung in das Internet of Things",
-            "ects": 5,
-            "pruefungsleistung": {
-                "pruefungsform": "KLAUSUR",
-                "versuche": []
-            }
-        },
-        {
-            "kurs_id": "WAHL6",
-            "kursname": "Embedded Systems",
-            "ects": 5,
-            "pruefungsleistung": {
-                "pruefungsform": "KLAUSUR",
-                "versuche": []
+                "versuche": [
+                    {
+                        "note": 1.0
+                    }
+                ]
             }
         },
         {

@@ -24,6 +24,7 @@ class StudienAnalyseService(StudienAnalyseUseCase):
 
         erreichte_ects = self._erreichte_ects(studium)
         offene_ects = self._offene_ects(studium, erreichte_ects)
+        geplante_ects = self._geplante_ects(studium)
 
         return DashboardDatenResponse(
             studiengang=studium.studiengang,
@@ -32,6 +33,8 @@ class StudienAnalyseService(StudienAnalyseUseCase):
             gesamt_ects=studium.gesamt_ects,
             erreichte_ects=erreichte_ects,
             offene_ects=offene_ects,
+            geplante_ects=geplante_ects,
+            ungeplante_ects=self._ungeplante_ects(studium, geplante_ects),
             fortschritt_prozent=self._fortschritt_prozent(studium, erreichte_ects),
             ects_nach_status=self._ects_nach_status_erstellen(studium),
             notendurchschnitt=studium.gewichteter_notendurchschnitt,
@@ -48,6 +51,12 @@ class StudienAnalyseService(StudienAnalyseUseCase):
 
     def _offene_ects(self, studium: Studium, erreichte_ects: int) -> int:
         return max(studium.gesamt_ects - erreichte_ects, 0)
+
+    def _geplante_ects(self, studium: Studium) -> int:
+        return sum(modul.ects for modul in studium.module)
+
+    def _ungeplante_ects(self, studium: Studium, geplante_ects: int) -> int:
+        return max(studium.gesamt_ects - geplante_ects, 0)
 
     def _fortschritt_prozent(self, studium: Studium, erreichte_ects: int) -> float:
         return round(erreichte_ects / studium.gesamt_ects * 100, 2)
