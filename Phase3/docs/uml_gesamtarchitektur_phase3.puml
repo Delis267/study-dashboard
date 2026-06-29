@@ -1,4 +1,4 @@
-@startuml Gesamtarchitektur
+@startuml gesamtarchitektur_uml
 skinparam classAttributeIconSize 0
 top to bottom direction
 
