@@ -2,10 +2,10 @@
 
 Im Ordner `Phase1` ausführen:
 
-run_tests.py ist ein Hilfsprogramm, dass alle Testprogramme dieser Phase nacheinander startet.
+run_phase1.py ist ein Hilfsprogramm, dass alle Testprogramme dieser Phase nacheinander startet.
 
 ```powershell
-python run_tests.py
+python run_phase1.py
 ```
 
 Einzeln können die Tests gestartet werden indem man in den /src Ordner wechelt.

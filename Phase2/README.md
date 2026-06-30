@@ -3,7 +3,7 @@
 Im Ordner `Phase2` ausführen:
 
 ```powershell
-python run_tests.py
+python run_phase2.py
 ```
 
 Das startet die OOP-Tests und den JSON-Repository-Test.
